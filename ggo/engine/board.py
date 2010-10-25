@@ -33,7 +33,10 @@ class Board:
         
     def make_move(self, color, x, y):
         vertex = goutil.coords_to_vertex(x,y)
-        self.gtp.move(color, vertex)
+        try: 
+            self.gtp.move(color, vertex)
+        except RuntimeError:
+            return False
         self.__update_stones()
         return True
         
