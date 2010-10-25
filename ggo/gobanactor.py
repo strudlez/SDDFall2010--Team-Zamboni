@@ -3,8 +3,12 @@ import engine.board
 import engine.goutil
 
 class Stone(clutter.Texture):
-    def __init__(self,color):
+    def __init__(self,color,x,y):
         clutter.Texture.__init__(self)
+
+        self.x = x
+        self.y = y
+
         if color == "black":
             self.set_from_file("black.png")
         else:
@@ -12,20 +16,38 @@ class Stone(clutter.Texture):
         self.set_size(40,40)
         self.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
 
+
+
 class GobanActor(clutter.Group):
+    def __place_stone(self, stone):
+        (cx, cy) = self.__intersection_to_position(stone.x,stone.y+1)
+        
+        self.add(stone)
+        stone.set_position(cx,cy)
+        stone.show()
+
     def __update_stones(self):
         old_stones = self.stones
         self.stones = {}
         
-        for stone in old_stones:
+        for p in old_stones:
+            stone = old_stones[p]
             stone.get_parent().remove(stone)
             
         for x in range(20):
             for y in range(20):
-                vertex = goutil.coords_to_vertex(x,y)
-                if vertex in old_stones.keys():
-                    self.stones[vertex] = self.old_stones[vertex]
-                
+                vertex = engine.goutil.coords_to_vertex(x,y)
+                if self.board.stones[x][y] == 'w':
+                    stone = Stone("white",x,y)
+                    self.stones[vertex] = stone
+                elif self.board.stones[x][y] == 'b':
+                    stone = Stone("black",x,y)
+                    self.stones[vertex] = stone
+
+        for stone in self.stones:
+            self.__place_stone(self.stones[stone])
+                    
+ 
 
             
     def __intersection_from_position(self,cx,cy):
@@ -37,8 +59,6 @@ class GobanActor(clutter.Group):
 
         x = round((cx-border_width)/(space_width+line_width))+1
         y = round((cy-border_width)/(space_height+line_width))+1
-        print (cx,cy)
-        print (x,y)
         return (int(x),int(y))
 
     def __intersection_to_position(self, x, y):
