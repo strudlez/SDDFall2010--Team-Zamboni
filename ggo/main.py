@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-
 import clutter
 import gobanactor
 import engine.board

@@ -51,22 +51,24 @@ class GobanActor(clutter.Group):
 
             
     def __intersection_from_position(self,cx,cy):
+
         ratio = 700/2000.0
         border_width = 60*ratio
-        line_width = 7*ratio
-        space_height = 100*ratio
-        space_width = 100*ratio
+        line_width = 6*ratio
+        space_height = 96*ratio
+        space_width = 96*ratio
 
         x = round((cx-border_width)/(space_width+line_width))+1
         y = round((cy-border_width)/(space_height+line_width))+1
         return (int(x),int(y))
 
     def __intersection_to_position(self, x, y):
+
         ratio = 700/2000.0
         border_width = 60*ratio
-        line_width = 7*ratio
-        space_height = 98*ratio
-        space_width = 98*ratio
+        line_width = 6.0*ratio
+        space_height = 96*ratio
+        space_width =  96*ratio
 
         cx = border_width+(line_width+space_width)*(x-1)
         cy = border_width+(line_width+space_height)*(y-1)
