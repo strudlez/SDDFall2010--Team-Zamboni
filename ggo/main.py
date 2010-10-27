@@ -5,7 +5,7 @@ import engine.board
 import pygtk
 pygtk.require('2.0')
 import gtk
-
+import cluttergtk
 
 last_color = "black"
 
@@ -29,28 +29,24 @@ class main_window:
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.connect("delete_event", self.delete_evt)
 		self.window.connect("destroy",self.destroy)
-		self.embed = clutter.cluttergtk.Embed()
+		self.embed = cluttergtk.Embed()
 		self.window.add(self.embed)
-		self.embed.show()
-
-
 		self.embed.realize()
-		windowSize = self.window.get_size()
-		self.embed.set_size_request(windowSize[0],windowSize[1])
-		stage = self.embed.get_stage() 
-		stage.set_minimum_size(700,700)
+		self.window.set_size_request(700, 700)
 
+		self.stage = self.embed.get_stage() 
+		self.stage.set_size(700,700)
+		
 		board = engine.board.Board()
 		goban = gobanactor.GobanActor(board)
-		stage.add(goban)
+		self.stage.add(goban)
 		
-		stage.show_all()
-		stage.show()
+		self.embed.show_all()
 		
-		stage.connect("delete-event",quit)
-		stage.connect("button-press-event",button_press,goban)
+		self.stage.connect("delete-event",quit)
+		self.stage.connect("button-press-event",button_press,goban)
 
-		clutter.main()
+		self.embed.show()
 		self.window.show()
 
 	def main(self):
