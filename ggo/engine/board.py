@@ -3,6 +3,7 @@ import goutil
 
 class Board:
     def __clear_stones(self):
+		#init the list of stones
         self.stones = [[None for a in range(20)] for b in range(20)]
         
     def __parse_stones(self, color):
@@ -16,7 +17,7 @@ class Board:
                 continue
             (x,y) = goutil.vertex_to_coords(vertex)
             (x,y) = (x-1,y-1)
-            self.stones[x][y]=mark
+            self.stones[x][y]=mark#keep track of the color of stone placed
 
     def __update_stones(self):
         self.__clear_stones()

@@ -27,8 +27,8 @@ class GobanActor(clutter.Group):
         stone.show()
 
     def __update_stones(self):
-        old_stones = self.stones
-        self.stones = {}
+        old_stones = self.stone_actors
+        self.stone_actors = {}
         
         for p in old_stones:
             stone = old_stones[p]
@@ -38,14 +38,16 @@ class GobanActor(clutter.Group):
             for y in range(20):
                 vertex = engine.goutil.coords_to_vertex(x,y)
                 if self.board.stones[x][y] == 'w':
-                    stone = Stone("white",x,y)
-                    self.stones[vertex] = stone
+					if((self.stone_actors.has_key(vertex))==False):
+						stone = Stone("white",x,y)
+						self.stone_actors[vertex] = stone
                 elif self.board.stones[x][y] == 'b':
-                    stone = Stone("black",x,y)
-                    self.stones[vertex] = stone
+					if((self.stone_actors.has_key(vertex))==False):
+						stone = Stone("black",x,y)
+						self.stone_actors[vertex] = stone
 
-        for stone in self.stones:
-            self.__place_stone(self.stones[stone])
+        for stone in self.stone_actors:
+            self.__place_stone(self.stone_actors[stone])
                     
  
 
@@ -89,7 +91,7 @@ class GobanActor(clutter.Group):
     def __init__(self, board):
         clutter.Group.__init__(self)#,*args)
         
-        self.stones = {}
+        self.stone_actors = {}
         
         self.board = board
 
