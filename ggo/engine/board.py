@@ -1,4 +1,4 @@
-import gtp.gtp
+import gtp
 import goutil
 
 class Board:
