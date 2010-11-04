@@ -1,10 +1,16 @@
 import os
 import gobject
+import shlex, subprocess
+
 
 class gtp:
     def __init__(self):
-        (self.infile, self.outfile) = os.popen2("/usr/bin/gnugo --mode gtp")
-
+		args = shlex.split("/usr/games/gnugo --mode gtp")
+		#(self.infile, self.outfile) 
+		self.proc = subprocess.Popen(args,stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+		self.infile = self.proc.stdin
+		self.outfile = self.proc.stdout
+		
     def tx(self, string):
         self.infile.write(string+'\n')
         self.infile.flush()
