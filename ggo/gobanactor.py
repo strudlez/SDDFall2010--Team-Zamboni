@@ -21,7 +21,6 @@ class Stone(clutter.Texture):
 class GobanActor(clutter.Group):
     def __place_stone(self, stone):
         (cx, cy) = self.__intersection_to_position(stone.x,stone.y+1)
-        
         self.add(stone)
         stone.set_position(cx,cy)
         stone.show()
@@ -34,8 +33,8 @@ class GobanActor(clutter.Group):
             stone = old_stones[p]
             stone.get_parent().remove(stone)
             
-        for x in range(20):
-            for y in range(20):
+        for x in range(19):
+            for y in range(19):
                 vertex = engine.goutil.coords_to_vertex(x,y)
                 if self.board.stones[x][y] == 'w':
 					if((self.stone_actors.has_key(vertex))==False):
@@ -74,7 +73,6 @@ class GobanActor(clutter.Group):
 
         cx = border_width+(line_width+space_width)*(x-1)
         cy = border_width+(line_width+space_height)*(y-1)
-        
         return (cx,cy)
     def place_stone(self, color, x, y):
         
