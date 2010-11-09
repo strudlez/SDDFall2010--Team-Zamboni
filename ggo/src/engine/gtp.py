@@ -15,6 +15,7 @@
 import os
 import gobject
 import glib
+import shlex, subprocess
 
 class gtp:
     def __gnugo_write_callback (self, source, condition):
@@ -26,7 +27,10 @@ class gtp:
         return True
 
     def __init__(self):
-        (self.infile, self.outfile) = os.popen2("/usr/games/gnugo --mode gtp")
+        args = shlex.split("/usr/games/gnugo --mode gtp")
+        self.proc = subprocess.Popen(args, stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE)
+        (self.infile, self.outfile) = (self.proc.stdin, self.proc.stdout)
         self.watch = glib.io_add_watch(self.outfile,glib.IO_IN, self.__gnugo_write_callback)
         self.waiting = False
 
