@@ -34,9 +34,8 @@ def button_press(stage, event, goban):
     
     if playerMove == True:
         playerMove = False
-        goban.place_stone_at_position("black",event.x,event.y)
-        goban.place_stone_gnugo("white",gnugo_played)
-    
+        if goban.place_stone_at_position("black",event.x,event.y):
+            goban.place_stone_gnugo("white",gnugo_played)
 
 def quit_callback(*args):
     quit()
