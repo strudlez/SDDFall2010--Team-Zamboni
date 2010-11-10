@@ -14,6 +14,7 @@
 
 def coords_to_vertex(x,y):
     letters = [chr(a) for a in range(ord('A'),ord('U'))]
+    assert x < 20, 'messed up column entry'
     if x < 9:
     	return letters[x-1]+str(y)
     if x >= 9:
