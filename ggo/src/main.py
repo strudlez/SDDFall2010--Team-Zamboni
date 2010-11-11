@@ -12,11 +12,14 @@ game_mode = "local"
 
 def gnugo_played(vertex):
     global last_color
+    global pass_count
     last_color == "white"
 
 def button_press(stage, event, goban):
     global last_color
     global game_mode
+    global pass_count
+    pass_count = 0
     if game_mode == "local":
         if last_color != "gameOver":
             if last_color == "white":
@@ -40,13 +43,28 @@ def forfeit_game(stage,goban):
         print "White Wins!"
     print score
 
-def pass_turn(stage):
+def pass_turn(stage,goban):
     global last_color
-    if last_color != "gameOver":
-        if last_color == "white":
-            last_color = "black"
-        else:
-            last_color = "white"
+    global pass_count
+    global game_mode
+    if game_mode == "local":
+        if last_color != "gameOver":
+            if pass_count == 1:
+                forfeit_game(stage, goban)
+            if pass_count == 0:
+                if last_color == "white":
+                    last_color = "black"
+                else:
+                    last_color = "white"
+                pass_count = 1
+    if game_mode == "ai":
+        if pass_count == 1:
+            forfeit_game(stage, goban)
+        if pass_count == 0:
+            if last_color == "white":
+                last_color == "black"
+                goban.place_stone_gnugo("white",gnugo_played)
+                pass_count = 1
 
 def estimate_score(stage, goban):
     score = goban.estimate_score()
@@ -185,7 +203,7 @@ class main_window:
         self.forfeit_b.set_size_request(60,40)
         self.forfeit_b.show()
         self.pass_b = gtk.Button("Pass")
-        self.pass_b.connect("clicked", pass_turn)
+        self.pass_b.connect("clicked", pass_turn, goban)
         self.pass_b.set_size_request(60,40)
         self.pass_b.show()
         self.estimate_b=gtk.Button("Estimate\nScore")
