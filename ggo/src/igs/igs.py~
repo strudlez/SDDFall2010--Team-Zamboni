@@ -1,0 +1,5 @@
+import gio
+
+class IGSClient:
+    def __init__(self):
+        self.client = gio.SocketClient()
