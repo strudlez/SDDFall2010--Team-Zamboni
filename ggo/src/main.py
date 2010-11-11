@@ -25,34 +25,34 @@ def button_press(stage, event, goban):
     global game_mode
     global pass_count
     pass_count = 0
-    if game_mode == "local":
+    if game_mode == "local": #If we are playing in local mode, alternate colors placed by player
         if last_color != "gameOver":
             if last_color == "white":
                 last_color = "black"
             else:
                 last_color = "white"
             goban.place_stone_at_position(last_color,event.x,event.y)
-    if game_mode == "ai":
+    if game_mode == "ai": #If we are playing in AI mode, the player plays black, and then the AI plays white
         if last_color == "white":
             if goban.place_stone_at_position("black",event.x,event.y):
                 last_color == "black"
                 goban.place_stone_gnugo("white",gnugo_played)
 
-def forfeit_game(stage,goban):
+def forfeit_game(stage,goban): #Functionality for the forfeit button in the sidepane - if it is pressed, last_color becomes gameOver to ensure no more stones are placed
     global last_color
     last_color = "gameOver"
-    score =  goban.estimate_score()
+    score =  goban.estimate_score() #Score is estimated by gnuGo and the winner is printed below
     if score[0] == "B":
-        print "Black Wins!"
+        print "Black Wins!" 
     if score[0] == "W":
         print "White Wins!"
     print score
 
-def pass_turn(stage,goban):
+def pass_turn(stage,goban): #Functionality for the pass button in the sidepane - if the pass button is pressed, the player forfeits their turn.  If the pass button is pressed twice in a row, the game ends.
     global last_color
     global pass_count
     global game_mode
-    if game_mode == "local":
+    if game_mode == "local": #If game mode is local, skip the current color and set pass_count to 1 if pass_count is 0 - else, end the game
         if last_color != "gameOver":
             if pass_count == 1:
                 forfeit_game(stage, goban)
@@ -62,7 +62,7 @@ def pass_turn(stage,goban):
                 else:
                     last_color = "white"
                 pass_count = 1
-    if game_mode == "ai":
+    if game_mode == "ai": #If game mode is AI, let AI play and set pass_count to 1.  If the player passes again, then end the game.
         if pass_count == 1:
             forfeit_game(stage, goban)
         if pass_count == 0:
@@ -71,24 +71,22 @@ def pass_turn(stage,goban):
                 goban.place_stone_gnugo("white",gnugo_played)
                 pass_count = 1
 
-def estimate_score(stage, goban):
+def estimate_score(stage, goban): #print the estimated score
     score = goban.estimate_score()
     if score != None:
         print score
-def set_handicap(stage, pieces, goban):
-    global game_mode
-    global last_color
+def set_handicap(stage, pieces, goban): #Set the number of handicap pieces to place when the board is initialized
     global handicap
     handicap = pieces
 
-def set_time(stage, goban, tim, bytim):
+def set_time(stage, goban, tim, bytim): #Sets the variables that store time to the desired settings
     global time
     global bytime
     time = tim
     bytime = bytim
     initialize_time(stage, goban)
         
-def initialize_handicap(stage, goban):
+def initialize_handicap(stage, goban): #Place stones at the typical positions in case there is a handicap
     global handicap
     x_pos = [135, 351, 568]
     y_pos = [126, 347, 564]
@@ -108,29 +106,24 @@ def initialize_handicap(stage, goban):
         goban.place_stone_at_position("black", x_pos[2], y_pos[2])
         goban.place_stone_at_position("black", x_pos[0], y_pos[2])
     if handicap >= 0:
-        if game_mode == "ai":
+        if game_mode == "ai": #If game mode is AI, the AI, being white, immediately plays
             goban.place_stone_gnugo("white", gnugo_played)
-        if game_mode == "local":
+        if game_mode == "local": #If game mode is local, switch the next piece placed to white
             last_color == "black"
 
-def initialize_time(stage, goban):
+def initialize_time(stage, goban): #Initializes the game clock with the desired amount of time.
     global time
     global bytime
     goban.set_time(time, bytime)
-    print goban.get_time("white")
-        
         
 class main_window:
-    def destroy(self,evt):
+    def destroy(self,evt): 
         gtk.main_quit()
-	
     def delete_evt(self,widget,event, data=None):
         pass
     def new_game(self,w,data):
         global game_mode
         game_mode = "local"
-    def set_handicap(self,w,data):
-        pass
     def new_teach_game(self,w,data):
         global game_mode
         game_mode = "ai"
@@ -138,10 +131,10 @@ class main_window:
         print "To be implemented"
     def save_game(self,w,data):
         print "To be implemented"
-    def start_game(self, stage, goban):
+    def start_game(self, stage, goban): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
         initialize_handicap(self.stage, goban)
-        set_time(self.stage, goban, self.time_entry.get_text(), self.time_entry.get_text())
-    def settings_window(self,w,data):
+        set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
+    def settings_window(self,w,data): #Creates a window with radial buttons for handicap stone number and text entry fields to desired amount of time and byo-yomi time
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
         dialog.set_title("Settings")
         self.time_entry = gtk.Entry()
@@ -165,7 +158,7 @@ class main_window:
         dialog.vbox.pack_start(self.r1)
         self.r1.show()
         self.r1 = gtk.RadioButton(self.r1, "6 Stones")
-        self.r1.connect("toggled", self.start_game, self.goban)
+        self.r1.connect("toggled", set_handicap, 6, self.goban)
         dialog.vbox.pack_start(self.r1)
         self.r1.show()
         dialog.vbox.pack_start(self.label)
@@ -175,9 +168,10 @@ class main_window:
 
         
         accept_b=gtk.Button("Accept")
-        accept_b.connect("clicked", self.start_game, self.goban, self.r1)
+        accept_b.connect("clicked", self.start_game, self.goban)
         accept_b.set_size_request(60,40)
         accept_b.show()
+        dialog.vbox.pack_start(accept_b)
 
         self.r1.set_flags(gtk.CAN_DEFAULT)
         self.r1.grab_default()
@@ -276,11 +270,17 @@ class main_window:
         self.estimate_b.connect("clicked", estimate_score, self.goban)
         self.estimate_b.set_size_request(60,40)
         self.estimate_b.show()
+        self.time_window = gtk.Entry()
+        self.label = gtk.Label("Time Remaining: White")
+        self.time_window.set_text("Time Placeholder")
+        self.time_window.set_editable(False)
+        self.time_window.show()
 
 
         self.toolbar.append_widget(self.forfeit_b,"End Game","Private")
         self.toolbar.append_widget(self.pass_b,"Pass Turn","Private")
         self.toolbar.append_widget(self.estimate_b,"Show estimate of current score","Private")
+        self.toolbar.append_widget(self.time_window, "Show time remaining","Private")
         self.top_box.pack_start(self.toolbar,True,True,0)
 
         self.top_box.show()
