@@ -23,14 +23,52 @@ class main_window:
 		
 	def delete_evt(self,widget,event, data=None):
 		pass
-	def new_game(self):
+	def new_game(self,w,data):
 		pass
-	def load_game(self):
+	def set_handicap(self,w,data):
 		pass
-	def save_game(self):
+	def new_teach_game(self,w,data):
 		pass
-	def settings_window(self):
+	def load_game(self,w,data):
 		pass
+	def save_game(self,w,data):
+		pass
+	def settings_window(self,w,data):
+		dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
+		dialog.set_title("Settings")
+		time_entry = gtk.Entry()
+		label = gtk.Label("Time Allowance:")
+
+		r1 = gtk.RadioButton(None, "No Handycap")
+		r1.connect("toggled", self.set_handicap, "No Handycap")
+		r1.set_active(True)
+		dialog.vbox.pack_start(r1)
+		r1.show()
+		r1 = gtk.RadioButton(r1, "2 Stones")
+		r1.connect("toggled", self.set_handicap, "2 Stones")
+		dialog.vbox.pack_start(r1)
+		r1.show()
+		r1 = gtk.RadioButton(r1, "4 Stones")
+		r1.connect("toggled", self.set_handicap, "4 Stones")
+		dialog.vbox.pack_start(r1)
+		r1.show()
+		r1 = gtk.RadioButton(r1, "6 Stones")
+		r1.connect("toggled", self.set_handicap, "6 Stones")
+		dialog.vbox.pack_start(r1)
+		r1.show()
+		dialog.vbox.pack_start(label)
+		dialog.vbox.pack_start(time_entry)
+		
+
+		r1.set_flags(gtk.CAN_DEFAULT)
+		r1.grab_default()
+		
+		label.show()
+		time_entry.show()
+		dialog.run()
+		dialog.destroy()
+       
+       
 	def create_menu_bar(self,window):
 		accel_group=gtk.AccelGroup()
 		item_factr = gtk.ItemFactory(gtk.MenuBar, "<main>", accel_group)
@@ -41,7 +79,8 @@ class main_window:
 	
 	def __init__(self):
 		self.menu_items = (( "/_File",         None,         None, 0, "<Branch>" ),
-		( "/File/_New","<control>N", self.new_game, 0, None ),
+		( "/File/_New Game","<control>N", self.new_game, 0, None ),
+		( "/File/_New Teaching Game","<control>T", self.new_teach_game, 0, None ),
 		( "/File/_Open","<control>O", self.load_game, 0, None ),
 		( "/File/_Save","<control>S", self.save_game, 0, None ),
 		( "/File/sep1", None,None, 0, "<Separator>" ),
@@ -91,6 +130,7 @@ class main_window:
 		s_win.show()
 		
 		self.game_board_container.add(s_win)
+		#self.game_board_container.connect('child-detached', self.wrap_window, self.game_board_container)
 		hpane.pack1(self.game_board_container, resize=True)
 		hpane.set_position(700)
 		
@@ -108,9 +148,14 @@ class main_window:
 		self.pass_b = gtk.Button("Pass")
 		self.pass_b.set_size_request(60,40)
 		self.pass_b.show()
+		self.estimate_b=gtk.Button("Estimate\nScore")
+		self.estimate_b.set_size_request(60,40)
+		self.estimate_b.show()
+
 		
 		self.toolbar.append_widget(self.forfeit_b,"End Game","Private")
 		self.toolbar.append_widget(self.pass_b,"Pass Turn","Private")
+		self.toolbar.append_widget(self.estimate_b,"Show estimate of current score","Private")
 		self.top_box.pack_start(self.toolbar,True,True,0)
 		
 		self.top_box.show()
