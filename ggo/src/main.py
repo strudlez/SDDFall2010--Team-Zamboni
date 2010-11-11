@@ -16,16 +16,15 @@ bytime = 10
 def gnugo_played(vertex):
     global last_color
     global pass_count
-    last_color == "white"
+    last_color = "white"
 
 def button_press(stage, event, goban):
-    print event.x
-    print event.y
     global last_color
     global game_mode
     global pass_count
     pass_count = 0
     if game_mode == "local": #If we are playing in local mode, alternate colors placed by player
+        print last_color
         if last_color != "gameOver":
             if last_color == "white":
                 last_color = "black"
@@ -88,6 +87,7 @@ def set_time(stage, goban, tim, bytim): #Sets the variables that store time to t
         
 def initialize_handicap(stage, goban): #Place stones at the typical positions in case there is a handicap
     global handicap
+    global last_color
     x_pos = [135, 351, 568]
     y_pos = [126, 347, 564]
     if handicap == 2:
@@ -109,7 +109,7 @@ def initialize_handicap(stage, goban): #Place stones at the typical positions in
         if game_mode == "ai": #If game mode is AI, the AI, being white, immediately plays
             goban.place_stone_gnugo("white", gnugo_played)
         if game_mode == "local": #If game mode is local, switch the next piece placed to white
-            last_color == "black"
+            last_color = "black"
 
 def initialize_time(stage, goban): #Initializes the game clock with the desired amount of time.
     global time
@@ -131,31 +131,34 @@ class main_window:
         print "To be implemented"
     def save_game(self,w,data):
         print "To be implemented"
-    def start_game(self, stage, goban): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
+    def start_game(self, stage, goban,dialog): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
         initialize_handicap(self.stage, goban)
-        set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
-    def main_menu(self, w, data):
+        dialog.destroy()
+        #set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
+    def main_menu(self, w, data): #Initializes the main menu of game modes
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
         dialog.set_title("Main Menu")
-        local_b=gtk.Button("Local Play") #Accept button to finalize setting choices
-        local_b.connect("clicked", self.start_local, self.goban)
+        local_b=gtk.Button("Local Play") #Button for local play
+        local_b.connect("clicked", self.start_local, self.goban, dialog)
         local_b.set_size_request(60,40)
         local_b.show()
         dialog.vbox.pack_start(local_b)
-        ai_b=gtk.Button("AI Play") #Accept button to finalize setting choices
-        ai_b.connect("clicked", self.start_ai, self.goban)
+        ai_b=gtk.Button("AI Play") #Button for AI play
+        ai_b.connect("clicked", self.start_ai, self.goban, dialog)
         ai_b.set_size_request(60,40)
         ai_b.show()
         dialog.vbox.pack_start(ai_b)
         dialog.run()
         dialog.destroy()
-    def start_local(self, stage, goban):
+    def start_local(self, stage, goban, dialog):
         global game_mode
         game_mode = "local"
+        dialog.destroy()
         self.settings = self.settings_window(0,None)
-    def start_ai(self, stage, goban):
+    def start_ai(self, stage, goban, dialog):
         global game_mode
         game_mode = "ai"
+        dialog.destroy()
         self.settings = self.settings_window(0,None)
     def settings_window(self,w,data): #Creates a window with radio buttons for handicap stone number and text entry fields to desired amount of time and byo-yomi time
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
@@ -191,7 +194,7 @@ class main_window:
 
         
         accept_b=gtk.Button("Accept") #Accept button to finalize setting choices
-        accept_b.connect("clicked", self.start_game, self.goban)
+        accept_b.connect("clicked", self.start_game, self.goban, dialog)
         accept_b.set_size_request(60,40)
         accept_b.show()
         dialog.vbox.pack_start(accept_b)

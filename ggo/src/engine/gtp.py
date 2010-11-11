@@ -35,11 +35,13 @@ class gtp:
         self.waiting = False
 
     def tx(self, string):
+        print string
         self.infile.write(string+'\n')
         self.infile.flush()
 
     def rx(self):
         line = self.outfile.readline()
+        print line
         if line[0] == '?':
             self.outfile.readline()
             raise RuntimeError(line[2:-1])
@@ -80,7 +82,7 @@ class gtp:
     
     def move(self, color, vertex):
         self.tx('play ' + color + ' ' + vertex)
-        self.rx()
+        print self.rx()
         
     def pass_move(self, color):
         self.tx('play ' + color + 'pass')

@@ -25,6 +25,7 @@ class Board:
         else:
             mark = 'b'
         stone_list = self.gtp.list_stones(color)
+        print stone_list
         for vertex in stone_list.split(' '):
             if len(vertex) < 2:
                 continue
@@ -61,7 +62,7 @@ class Board:
 
     def set_time(self, time, bytime):
         try:
-            tim = self.gtp.time_settings(time, bytime, 0)
+            tim = self.gtp.time_settings(time, bytime, 30)
         except RuntimeError:
             return False
         return tim
@@ -77,7 +78,6 @@ class Board:
         vertex = goutil.coords_to_vertex(x,y)
         try: 
             self.gtp.move(color, vertex)
-            self.gtp.estimate_score()
         except RuntimeError:
             return False
         self.__update_stones()
