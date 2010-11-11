@@ -44,11 +44,26 @@ class Board:
         self.gtp.set_boardsize("19")
         self.gtp.clear_board()
         self.__clear_stones()
+
+    def estimate_score(self):
+        try:
+            score = self.gtp.estimate_score()
+        except RuntimeError:
+            return False
+        return score
+
+    def final_score(self):
+        try:
+            score = self.gtp.final_score()
+        except RuntimeError:
+            return False
+        return score
         
     def make_move(self, color, x, y):
         vertex = goutil.coords_to_vertex(x,y)
         try: 
             self.gtp.move(color, vertex)
+            self.gtp.estimate_score()
         except RuntimeError:
             return False
         self.__update_stones()

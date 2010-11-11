@@ -86,9 +86,9 @@ class gtp:
         self.tx('play ' + color + 'pass')
         self.rx()
 
-    def end_score(self):
-        self.tx('end_score')
-        return self.rx()
+    def final_score(self):
+        self.tx('final_score')
+        return self.rx
     
     def set_level(self, level):
         self.tx('level ' + str(level))
@@ -104,7 +104,15 @@ class gtp:
     
     def undo(self):
         self.tx('undo')
-        self.rx()
+        return self.rx()
+
+    def countlib(self, vertex):
+        self.tx('countlib ' + vertex)
+        return self.rx()
+
+    def estimate_score(self):
+        self.tx('estimate_score')
+        print self.rx()
      
     def genmove(self, color, callback):
         self.waiting = True
