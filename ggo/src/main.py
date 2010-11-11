@@ -9,6 +9,9 @@ import cluttergtk
 
 last_color = "white"
 game_mode = "local"
+handicap = 0
+time = 60
+bytime = 10
 
 def gnugo_played(vertex):
     global last_color
@@ -16,6 +19,8 @@ def gnugo_played(vertex):
     last_color == "white"
 
 def button_press(stage, event, goban):
+    print event.x
+    print event.y
     global last_color
     global game_mode
     global pass_count
@@ -70,7 +75,51 @@ def estimate_score(stage, goban):
     score = goban.estimate_score()
     if score != None:
         print score
+def set_handicap(stage, pieces, goban):
+    global game_mode
+    global last_color
+    global handicap
+    handicap = pieces
 
+def set_time(stage, goban, tim, bytim):
+    global time
+    global bytime
+    time = tim
+    bytime = bytim
+    initialize_time(stage, goban)
+        
+def initialize_handicap(stage, goban):
+    global handicap
+    x_pos = [135, 351, 568]
+    y_pos = [126, 347, 564]
+    if handicap == 2:
+        goban.place_stone_at_position("black", x_pos[2], y_pos[0])
+        goban.place_stone_at_position("black", x_pos[0], y_pos[2])
+    if handicap == 4:
+        goban.place_stone_at_position("black", x_pos[2], y_pos[0])
+        goban.place_stone_at_position("black", x_pos[0], y_pos[2])
+        goban.place_stone_at_position("black", x_pos[2], y_pos[2])
+        goban.place_stone_at_position("black", x_pos[0], y_pos[0])
+    if handicap == 6:
+        goban.place_stone_at_position("black", x_pos[2], y_pos[0])
+        goban.place_stone_at_position("black", x_pos[0], y_pos[0])
+        goban.place_stone_at_position("black", x_pos[2], y_pos[1])
+        goban.place_stone_at_position("black", x_pos[0], y_pos[1])
+        goban.place_stone_at_position("black", x_pos[2], y_pos[2])
+        goban.place_stone_at_position("black", x_pos[0], y_pos[2])
+    if handicap >= 0:
+        if game_mode == "ai":
+            goban.place_stone_gnugo("white", gnugo_played)
+        if game_mode == "local":
+            last_color == "black"
+
+def initialize_time(stage, goban):
+    global time
+    global bytime
+    goban.set_time(time, bytime)
+    print goban.get_time("white")
+        
+        
 class main_window:
     def destroy(self,evt):
         gtk.main_quit()
@@ -89,38 +138,54 @@ class main_window:
         print "To be implemented"
     def save_game(self,w,data):
         print "To be implemented"
+    def start_game(self, stage, goban):
+        initialize_handicap(self.stage, goban)
+        set_time(self.stage, goban, self.time_entry.get_text(), self.time_entry.get_text())
     def settings_window(self,w,data):
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
         dialog.set_title("Settings")
-        time_entry = gtk.Entry()
-        label = gtk.Label("Time Allowance:")
+        self.time_entry = gtk.Entry()
+        self.time_entry.set_text("60")
+        self.label = gtk.Label("Time Allowance:")
+        self.by_entry = gtk.Entry()
+        self.by_entry.set_text("10")
+        self.label1 = gtk.Label("Byo-Yomi time:")
 
-        r1 = gtk.RadioButton(None, "No Handycap")
-        r1.connect("toggled", self.set_handicap, "No Handycap")
-        r1.set_active(True)
-        dialog.vbox.pack_start(r1)
-        r1.show()
-        r1 = gtk.RadioButton(r1, "2 Stones")
-        r1.connect("toggled", self.set_handicap, "2 Stones")
-        dialog.vbox.pack_start(r1)
-        r1.show()
-        r1 = gtk.RadioButton(r1, "4 Stones")
-        r1.connect("toggled", self.set_handicap, "4 Stones")
-        dialog.vbox.pack_start(r1)
-        r1.show()
-        r1 = gtk.RadioButton(r1, "6 Stones")
-        r1.connect("toggled", self.set_handicap, "6 Stones")
-        dialog.vbox.pack_start(r1)
-        r1.show()
-        dialog.vbox.pack_start(label)
-        dialog.vbox.pack_start(time_entry)
+        self.r1 = gtk.RadioButton(None, "No Handicap")
+        self.r1.connect("toggled", set_handicap, 0, self.goban)
+        self.r1.set_active(True)
+        dialog.vbox.pack_start(self.r1)
+        self.r1.show()
+        self.r1 = gtk.RadioButton(self.r1, "2 Stones")
+        self.r1.connect("toggled", set_handicap, 2, self.goban)
+        dialog.vbox.pack_start(self.r1)
+        self.r1.show()
+        self.r1 = gtk.RadioButton(self.r1, "4 Stones")
+        self.r1.connect("toggled", set_handicap, 4, self.goban)
+        dialog.vbox.pack_start(self.r1)
+        self.r1.show()
+        self.r1 = gtk.RadioButton(self.r1, "6 Stones")
+        self.r1.connect("toggled", self.start_game, self.goban)
+        dialog.vbox.pack_start(self.r1)
+        self.r1.show()
+        dialog.vbox.pack_start(self.label)
+        dialog.vbox.pack_start(self.time_entry)
+        dialog.vbox.pack_start(self.label1)
+        dialog.vbox.pack_start(self.by_entry)
 
+        
+        accept_b=gtk.Button("Accept")
+        accept_b.connect("clicked", self.start_game, self.goban, self.r1)
+        accept_b.set_size_request(60,40)
+        accept_b.show()
 
-        r1.set_flags(gtk.CAN_DEFAULT)
-        r1.grab_default()
+        self.r1.set_flags(gtk.CAN_DEFAULT)
+        self.r1.grab_default()
 
-        label.show()
-        time_entry.show()
+        self.label.show()
+        self.label1.show()
+        self.time_entry.show()
+        self.by_entry.show()
         dialog.run()
         dialog.destroy()
        
@@ -134,6 +199,9 @@ class main_window:
         return item_factr.get_widget("<main>")
 	
     def __init__(self):
+        
+        self.board = engine.board.Board()
+        self.goban = gobanactor.GobanActor(self.board)
         self.menu_items = (( "/_File",         None,         None, 0, "<Branch>" ),
         ( "/File/_New Game","<control>N", self.new_game, 0, None ),
         ( "/File/_New Teaching Game","<control>T", self.new_teach_game, 0, None ),
@@ -142,7 +210,7 @@ class main_window:
         ( "/File/sep1", None,None, 0, "<Separator>" ),
         ( "/File/Quit","<control>Q", gtk.main_quit, 0, None ),
         ( "/_Options",None,None, 0, "<Branch>" ),
-        ( "/Options/_Settings","<control>R", self.settings_window, 0, None ),
+        ( "/Options/_Settings","<control>R", self.settings_window, 0, None),
         ( "/_Help",None,None, 0, "<LastBranch>" ),
         ( "/_Help/About",None,None, 0, None ),)
 
@@ -194,20 +262,18 @@ class main_window:
         self.stage = self.embed.get_stage() 
         self.stage.set_size(700,700)
 
-        board = engine.board.Board()
-        goban = gobanactor.GobanActor(board)
-        self.stage.add(goban)
+        self.stage.add(self.goban)
 
         self.forfeit_b=gtk.Button("Forfeit")
-        self.forfeit_b.connect("clicked", forfeit_game, goban)
+        self.forfeit_b.connect("clicked", forfeit_game, self.goban)
         self.forfeit_b.set_size_request(60,40)
         self.forfeit_b.show()
         self.pass_b = gtk.Button("Pass")
-        self.pass_b.connect("clicked", pass_turn, goban)
+        self.pass_b.connect("clicked", pass_turn, self.goban)
         self.pass_b.set_size_request(60,40)
         self.pass_b.show()
         self.estimate_b=gtk.Button("Estimate\nScore")
-        self.estimate_b.connect("clicked", estimate_score, goban)
+        self.estimate_b.connect("clicked", estimate_score, self.goban)
         self.estimate_b.set_size_request(60,40)
         self.estimate_b.show()
 
@@ -225,13 +291,14 @@ class main_window:
         self.embed.show_all()
 
         self.stage.connect("delete-event",quit)
-        self.stage.connect("button-press-event",button_press,goban)
+        self.stage.connect("button-press-event",button_press,self.goban)
 
         self.game_board_container.show()
         hpane.show()
         self.toolbar.show()
         self.embed.show()
         self.window.show()
+        self.settings = self.settings_window(0,None)
 
     def main(self):
         gtk.main()

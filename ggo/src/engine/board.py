@@ -58,7 +58,21 @@ class Board:
         except RuntimeError:
             return False
         return score
-        
+
+    def set_time(self, time, bytime):
+        try:
+            tim = self.gtp.time_settings(time, bytime, 0)
+        except RuntimeError:
+            return False
+        return tim
+
+    def get_time(self, color):
+        try:
+            timelft = self.gtp.time_left(color)
+        except RuntimeError:
+            return False
+        return timelft
+     
     def make_move(self, color, x, y):
         vertex = goutil.coords_to_vertex(x,y)
         try: 

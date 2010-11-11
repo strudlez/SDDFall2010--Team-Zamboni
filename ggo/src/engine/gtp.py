@@ -113,6 +113,14 @@ class gtp:
     def estimate_score(self):
         self.tx('estimate_score')
         return self.rx()
+
+    def time_settings(self, time, bytime, bystones):
+        self.tx('time_settings ' + str(time) + ' ' + str(bytime) + ' ' + str(bystones))
+        return self.rx()
+
+    def time_left(self,color):
+        self.tx('time_left ' + color + ' 11 3')
+        return self.rx()
      
     def genmove(self, color, callback):
         self.waiting = True
