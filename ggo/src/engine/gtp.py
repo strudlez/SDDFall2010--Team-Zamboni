@@ -35,11 +35,13 @@ class gtp:
         self.waiting = False
 
     def tx(self, string):
+        print string
         self.infile.write(string+'\n')
         self.infile.flush()
 
     def rx(self):
         line = self.outfile.readline()
+        print line
         if line[0] == '?':
             self.outfile.readline()
             raise RuntimeError(line[2:-1])
@@ -80,15 +82,15 @@ class gtp:
     
     def move(self, color, vertex):
         self.tx('play ' + color + ' ' + vertex)
-        self.rx()
+        print self.rx()
         
     def pass_move(self, color):
         self.tx('play ' + color + 'pass')
         self.rx()
 
-    def end_score(self):
-        self.tx('end_score')
-        return self.rx()
+    def final_score(self):
+        self.tx('final_score')
+        return self.rx
     
     def set_level(self, level):
         self.tx('level ' + str(level))
@@ -104,7 +106,23 @@ class gtp:
     
     def undo(self):
         self.tx('undo')
-        self.rx()
+        return self.rx()
+
+    def countlib(self, vertex):
+        self.tx('countlib ' + vertex)
+        return self.rx()
+
+    def estimate_score(self):
+        self.tx('estimate_score')
+        return self.rx()
+
+    def time_settings(self, time, bytime, bystones):
+        self.tx('time_settings ' + str(time) + ' ' + str(bytime) + ' ' + str(bystones))
+        return self.rx()
+
+    def time_left(self,color):
+        self.tx('time_left ' + color + ' 11 3')
+        return self.rx()
      
     def genmove(self, color, callback):
         self.waiting = True

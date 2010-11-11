@@ -108,6 +108,18 @@ class GobanActor(clutter.Group):
         (x,y) = self.__intersection_from_position(cx,cy)
         return self.place_stone(Color,x,y)
 
+    def estimate_score(self):
+        return self.board.estimate_score()
+
+    def final_score(self):
+        return self.board.final_score()
+
+    def get_time(self, color):
+        return self.board.get_time(color)
+
+    def set_time(self, time, bytime):
+        return self.board.set_time(time, bytime)
+
     def __init__(self, board):
         clutter.Group.__init__(self)#,*args)
         
