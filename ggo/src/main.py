@@ -134,17 +134,40 @@ class main_window:
     def start_game(self, stage, goban): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
         initialize_handicap(self.stage, goban)
         set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
-    def settings_window(self,w,data): #Creates a window with radial buttons for handicap stone number and text entry fields to desired amount of time and byo-yomi time
+    def main_menu(self, w, data):
+        dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
+        dialog.set_title("Main Menu")
+        local_b=gtk.Button("Local Play") #Accept button to finalize setting choices
+        local_b.connect("clicked", self.start_local, self.goban)
+        local_b.set_size_request(60,40)
+        local_b.show()
+        dialog.vbox.pack_start(local_b)
+        ai_b=gtk.Button("AI Play") #Accept button to finalize setting choices
+        ai_b.connect("clicked", self.start_ai, self.goban)
+        ai_b.set_size_request(60,40)
+        ai_b.show()
+        dialog.vbox.pack_start(ai_b)
+        dialog.run()
+        dialog.destroy()
+    def start_local(self, stage, goban):
+        global game_mode
+        game_mode = "local"
+        self.settings = self.settings_window(0,None)
+    def start_ai(self, stage, goban):
+        global game_mode
+        game_mode = "ai"
+        self.settings = self.settings_window(0,None)
+    def settings_window(self,w,data): #Creates a window with radio buttons for handicap stone number and text entry fields to desired amount of time and byo-yomi time
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
         dialog.set_title("Settings")
-        self.time_entry = gtk.Entry()
+        self.time_entry = gtk.Entry() #Prepares the text entry fields
         self.time_entry.set_text("60")
         self.label = gtk.Label("Time Allowance:")
         self.by_entry = gtk.Entry()
         self.by_entry.set_text("10")
         self.label1 = gtk.Label("Byo-Yomi time:")
 
-        self.r1 = gtk.RadioButton(None, "No Handicap")
+        self.r1 = gtk.RadioButton(None, "No Handicap") #Sets up the radio buttons
         self.r1.connect("toggled", set_handicap, 0, self.goban)
         self.r1.set_active(True)
         dialog.vbox.pack_start(self.r1)
@@ -167,7 +190,7 @@ class main_window:
         dialog.vbox.pack_start(self.by_entry)
 
         
-        accept_b=gtk.Button("Accept")
+        accept_b=gtk.Button("Accept") #Accept button to finalize setting choices
         accept_b.connect("clicked", self.start_game, self.goban)
         accept_b.set_size_request(60,40)
         accept_b.show()
@@ -184,7 +207,7 @@ class main_window:
         dialog.destroy()
        
        
-    def create_menu_bar(self,window):
+    def create_menu_bar(self,window): #Create all the File, Options, and Help drop down menus at the top of the screen
         accel_group=gtk.AccelGroup()
         item_factr = gtk.ItemFactory(gtk.MenuBar, "<main>", accel_group)
         item_factr.create_items(self.menu_items)
@@ -196,7 +219,7 @@ class main_window:
         
         self.board = engine.board.Board()
         self.goban = gobanactor.GobanActor(self.board)
-        self.menu_items = (( "/_File",         None,         None, 0, "<Branch>" ),
+        self.menu_items = (( "/_File",         None,         None, 0, "<Branch>" ), #Sets up the menu items for future use
         ( "/File/_New Game","<control>N", self.new_game, 0, None ),
         ( "/File/_New Teaching Game","<control>T", self.new_teach_game, 0, None ),
         ( "/File/_Open","<control>O", self.load_game, 0, None ),
@@ -208,14 +231,14 @@ class main_window:
         ( "/_Help",None,None, 0, "<LastBranch>" ),
         ( "/_Help/About",None,None, 0, None ),)
 
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)  #Initializes a window
         self.window.connect("delete_event", self.delete_evt)
         self.window.connect("destroy",self.destroy)
         self.embed = cluttergtk.Embed()
 
-        menubar=self.create_menu_bar(self.window)
+        menubar=self.create_menu_bar(self.window) #Creates the menubar and makes it viewable
         menubar.show()
-        self.toolbar = gtk.Toolbar()
+        self.toolbar = gtk.Toolbar() #Creates two toolbars for use in storing UI widgets, and a game_board_container to handle the actual game display
         self.toolbar2 = gtk.Toolbar()
         self.game_board_container=gtk.HandleBox()
 
@@ -258,7 +281,7 @@ class main_window:
 
         self.stage.add(self.goban)
 
-        self.forfeit_b=gtk.Button("Forfeit")
+        self.forfeit_b=gtk.Button("Forfeit")  #Sets up a Forfeit, Pass, and Estimate Score button for the sidepane
         self.forfeit_b.connect("clicked", forfeit_game, self.goban)
         self.forfeit_b.set_size_request(60,40)
         self.forfeit_b.show()
@@ -271,19 +294,19 @@ class main_window:
         self.estimate_b.set_size_request(60,40)
         self.estimate_b.show()
         self.time_window = gtk.Entry()
-        self.label = gtk.Label("Time Remaining: White")
+        self.label = gtk.Label("Time Remaining: White") #Displays time remaining for each player - TBI
         self.time_window.set_text("Time Placeholder")
         self.time_window.set_editable(False)
         self.time_window.show()
 
 
-        self.toolbar.append_widget(self.forfeit_b,"End Game","Private")
+        self.toolbar.append_widget(self.forfeit_b,"End Game","Private") #Appens all the widgets to the toolbar and packs the toolbar into a Vbox
         self.toolbar.append_widget(self.pass_b,"Pass Turn","Private")
         self.toolbar.append_widget(self.estimate_b,"Show estimate of current score","Private")
         self.toolbar.append_widget(self.time_window, "Show time remaining","Private")
         self.top_box.pack_start(self.toolbar,True,True,0)
 
-        self.top_box.show()
+        self.top_box.show()  #Displays the sidepane
         hpane.pack2(horiz_align,resize=True)
 
         self.window.add(hpane)
@@ -298,8 +321,7 @@ class main_window:
         self.toolbar.show()
         self.embed.show()
         self.window.show()
-        self.settings = self.settings_window(0,None)
-
+        self.mm = self.main_menu(0,None)
     def main(self):
         gtk.main()
 	
