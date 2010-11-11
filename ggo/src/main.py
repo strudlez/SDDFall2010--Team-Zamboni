@@ -8,7 +8,7 @@ import gtk
 import cluttergtk
 
 last_color = "white"
-game_mode = "ai"
+game_mode = "local"
 
 def gnugo_played(vertex):
     global last_color
@@ -31,11 +31,14 @@ def button_press(stage, event, goban):
                 goban.place_stone_gnugo("white",gnugo_played)
 
 def forfeit_game(stage,goban):
-    print "made it"
     global last_color
     last_color = "gameOver"
-    print last_color
-    print goban.estimate_score()
+    score =  goban.estimate_score()
+    if score[0] == "B":
+        print "Black Wins!"
+    if score[0] == "W":
+        print "White Wins!"
+    print score
 
 def pass_turn(stage):
     global last_color
@@ -46,7 +49,9 @@ def pass_turn(stage):
             last_color = "white"
 
 def estimate_score(stage, goban):
-    goban.estimate_score()
+    score = goban.estimate_score()
+    if score != None:
+        print score
 
 class main_window:
     def destroy(self,evt):
@@ -180,10 +185,11 @@ class main_window:
         self.forfeit_b.set_size_request(60,40)
         self.forfeit_b.show()
         self.pass_b = gtk.Button("Pass")
-        #self.pass_b.connect("clicked", pass_turn)
+        self.pass_b.connect("clicked", pass_turn)
         self.pass_b.set_size_request(60,40)
         self.pass_b.show()
         self.estimate_b=gtk.Button("Estimate\nScore")
+        self.estimate_b.connect("clicked", estimate_score, goban)
         self.estimate_b.set_size_request(60,40)
         self.estimate_b.show()
 

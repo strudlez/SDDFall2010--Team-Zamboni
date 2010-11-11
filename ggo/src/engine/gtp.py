@@ -112,7 +112,7 @@ class gtp:
 
     def estimate_score(self):
         self.tx('estimate_score')
-        print self.rx()
+        return self.rx()
      
     def genmove(self, color, callback):
         self.waiting = True
