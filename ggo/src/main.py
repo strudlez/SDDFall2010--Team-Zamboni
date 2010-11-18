@@ -10,6 +10,7 @@ import cluttergtk
 last_color = "white"
 game_mode = "local"
 handicap = 0
+difficulty = 1
 time = 60
 bytime = 10
 
@@ -78,6 +79,10 @@ def set_handicap(stage, pieces, goban): #Set the number of handicap pieces to pl
     global handicap
     handicap = pieces
 
+def set_difficulty(stage, slider, goban): #Set the number of handicap pieces to place when the board is initialized
+    global difficulty
+    difficulty=int(slider.get_value())
+
 def set_time(stage, goban, tim, bytim): #Sets the variables that store time to the desired settings
     global time
     global bytime
@@ -127,11 +132,13 @@ class main_window:
     def new_teach_game(self,w,data):
         global game_mode
         game_mode = "ai"
+        
     def load_game(self,w,data):
         print "To be implemented"
     def save_game(self,w,data):
         print "To be implemented"
     def start_game(self, stage, goban,dialog): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
+        goban.board.gtp.level(difficulty)
         initialize_handicap(self.stage, goban)
         dialog.destroy()
         #set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
@@ -187,10 +194,23 @@ class main_window:
         self.r1.connect("toggled", set_handicap, 6, self.goban)
         dialog.vbox.pack_start(self.r1)
         self.r1.show()
+        if game_mode == "ai":
+            self.label2 = gtk.Label("Difficulty:")
+            self.label2.show()
+            self.difficult_scale=gtk.HScale()
+            self.difficult_scale.set_digits(0);
+            self.difficult_scale.set_range(1,10);
+            self.difficult_scale.connect("value_changed", set_difficulty, self.difficult_scale, self.goban)
+            self.difficult_scale.show();
+        
         dialog.vbox.pack_start(self.label)
         dialog.vbox.pack_start(self.time_entry)
         dialog.vbox.pack_start(self.label1)
         dialog.vbox.pack_start(self.by_entry)
+        
+        if game_mode == "ai":
+            dialog.vbox.pack_start(self.label2)
+            dialog.vbox.pack_start(self.difficult_scale)
 
         
         accept_b=gtk.Button("Accept") #Accept button to finalize setting choices
@@ -201,7 +221,7 @@ class main_window:
 
         self.r1.set_flags(gtk.CAN_DEFAULT)
         self.r1.grab_default()
-
+        
         self.label.show()
         self.label1.show()
         self.time_entry.show()
@@ -217,7 +237,7 @@ class main_window:
         window.add_accel_group(accel_group)
         self.item_factr=item_factr
         return item_factr.get_widget("<main>")
-	
+    
     def __init__(self):
         
         self.board = engine.board.Board()
@@ -327,7 +347,7 @@ class main_window:
         self.mm = self.main_menu(0,None)
     def main(self):
         gtk.main()
-	
+    
 if __name__=="__main__":
     win = main_window()
     win.main()
