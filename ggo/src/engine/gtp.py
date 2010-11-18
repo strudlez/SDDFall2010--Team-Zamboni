@@ -123,6 +123,10 @@ class gtp:
     def time_left(self,color):
         self.tx('time_left ' + color + ' 11 3')
         return self.rx()
+    
+    def level(self, lvl):
+        self.tx('level %d' % lvl)
+        return self.rx()
      
     def genmove(self, color, callback):
         self.waiting = True
