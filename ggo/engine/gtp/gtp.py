@@ -78,7 +78,10 @@ class gtp:
     def get_captures(self, color):
         self.tx('captures ' + color)
         return self.rx()
-    
+    def count_liberties(self, vertex):
+		self.tx('countlib ' + vertex)
+		return self.rx()
+        
     def undo(self):
         self.tx('undo')
         self.rx()

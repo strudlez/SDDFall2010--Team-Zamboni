@@ -8,9 +8,14 @@ class Stone(clutter.Texture):
 
         self.x = x
         self.y = y
-
+        self.color = color
+		
         if color == "black":
             self.set_from_file("black.png")
+        elif color == "white_c":
+            self.set_from_file("white_c.png")
+        elif color == "black_c":
+            self.set_from_file("black_c.png")
         else:
             self.set_from_file("white.png")
         self.set_size(40,40)
@@ -20,10 +25,11 @@ class Stone(clutter.Texture):
 
 class GobanActor(clutter.Group):
     def __place_stone(self, stone):
-        (cx, cy) = self.__intersection_to_position(stone.x,stone.y+1)
-        self.add(stone)
-        stone.set_position(cx,cy)
-        stone.show()
+		
+		(cx, cy) = self.__intersection_to_position(stone.x,stone.y+1)
+		self.add(stone)
+		stone.set_position(cx,cy)
+		stone.show()
 
     def __update_stones(self):
         old_stones = self.stone_actors
@@ -36,14 +42,28 @@ class GobanActor(clutter.Group):
         for x in range(19):
             for y in range(19):
                 vertex = engine.goutil.coords_to_vertex(x,y)
+                vertex2 = engine.goutil.coords_to_vertex(x,y+1)
                 if self.board.stones[x][y] == 'w':
 					if((self.stone_actors.has_key(vertex))==False):
-						stone = Stone("white",x,y)
+						color="white"
+						try:
+							if(self.board.gtp.count_liberties(vertex2)=='1'):
+								color="white_c"
+						except:
+							pass
+						stone = Stone(color,x,y)
 						self.stone_actors[vertex] = stone
                 elif self.board.stones[x][y] == 'b':
 					if((self.stone_actors.has_key(vertex))==False):
-						stone = Stone("black",x,y)
+						color="black"
+						try:
+							if(self.board.gtp.count_liberties(vertex2)=='1'):
+								color="black_c"
+						except:
+							pass
+						stone = Stone(color,x,y)
 						self.stone_actors[vertex] = stone
+						
 
         for stone in self.stone_actors:
             self.__place_stone(self.stone_actors[stone])
