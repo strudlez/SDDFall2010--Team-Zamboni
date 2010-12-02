@@ -147,8 +147,11 @@ class main_window:
             
         goban.board.gtp.level(difficulty)
         initialize_handicap(self.stage, goban)
+        
+        set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
+        
         dialog.destroy()
-        #set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
+        
     def main_menu(self, w, data): #Initializes the main menu of game modes
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
         dialog.set_title("Main Menu")
