@@ -131,12 +131,39 @@ class main_window:
         game_mode = "local"
     def new_teach_game(self,w,data): #Sets the game mode to AI
         global game_mode
-        game_mode = "ai"
-        
+        game_mode = "ai"  
     def load_game(self,w,data): #For viewing past games
         print "To be implemented"
     def save_game(self,w,data): #For recording games
         print "To be implemented"
+    def disp_history(self, widget, data):
+        color,parent,move_num = data.split(' ')
+        self.goban.__update_stones(alt_board=self.goban.history[int(move_num)-1])
+        print color
+    def add_hist_button(self,move_num, parent, color):
+        button = gtk.Button()
+        label = gtk.Label("%d "%move_num)
+        box = gtk.HBox(False, 0)
+        button.connect("clicked", self.disp_history, "%s %s %s" % (color,parent,move_num))
+        image = gtk.Image()
+        if(color=="white"):
+	        pixbuf = gtk.gdk.pixbuf_new_from_file("white.png")
+	        scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
+	        image.set_from_pixbuf(scaled_buf)
+	
+        else:
+	        pixbuf = gtk.gdk.pixbuf_new_from_file("black.png")
+	        scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
+	        image.set_from_pixbuf(scaled_buf)
+        image.show()
+        label.show()
+        box.pack_start(image, False, False, 3)
+        box.pack_start(label, False, False, 1)
+        button.add(box)
+        box.show()
+        button.set_size_request(28,24)
+        button.show()
+        self.button_box.pack_start(button, False, False, 5)
     def start_game(self, stage, goban,dialog): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
         goban.board.gtp.level(difficulty)
         initialize_handicap(self.stage, goban)
@@ -240,8 +267,6 @@ class main_window:
     
     def __init__(self):
         
-        self.board = engine.board.Board()
-        self.goban = gobanactor.GobanActor(self.board)
         self.menu_items = (( "/_File",         None,         None, 0, "<Branch>" ), #Sets up the menu items for future use
         ( "/File/_New Game","<control>N", self.new_game, 0, None ),
         ( "/File/_New Teaching Game","<control>T", self.new_teach_game, 0, None ),
@@ -268,6 +293,9 @@ class main_window:
         self.toolbar.set_style(gtk.TOOLBAR_BOTH)
 
         self.top_box = gtk.VBox(False,2)
+        self.button_box = gtk.HBox(False,2)#for history buttons
+        hist_buttons_align=gtk.Alignment(0,0,1,0)
+        hist_buttons_align.add(self.button_box)
         self.menu_box = gtk.HBox(False,2)
         horiz_align = gtk.Alignment(0,0,1,0)
 
@@ -277,21 +305,25 @@ class main_window:
         self.top_box.pack_start(separator,False,True,5)
 
         horiz_align.add(self.top_box)
-        horiz_align.show()
-        self.menu_box.show()
-        separator.show()
+        hist_buttons_align.add(self.button_box)
 
 
         self.embed.realize()
-        self.window.set_size_request(900, 700)
+        self.window.set_size_request(1200, 700)
         hpane = gtk.HPaned()
+        self.vpane = gtk.VPaned()
 
 
         s_win = gtk.ScrolledWindow()
         s_win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         s_win.add_with_viewport(self.embed)
         s_win.set_size_request(700, 700)
-        s_win.show()
+
+
+        hs_win = gtk.ScrolledWindow()
+        hs_win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        hs_win.add_with_viewport(hist_buttons_align)
+        hs_win.set_size_request(700, 700)
 
         self.game_board_container.add(s_win)
         #self.game_board_container.connect('child-detached', self.wrap_window, self.game_board_container)
@@ -302,20 +334,19 @@ class main_window:
         self.stage = self.embed.get_stage() 
         self.stage.set_size(700,700)
 
+        self.board = engine.board.Board()
+        self.goban = gobanactor.GobanActor(self.board, self)
         self.stage.add(self.goban)
 
         self.forfeit_b=gtk.Button("Forfeit")  #Sets up a Forfeit, Pass, and Estimate Score button for the sidepane
         self.forfeit_b.connect("clicked", forfeit_game, self.goban)
         self.forfeit_b.set_size_request(60,40)
-        self.forfeit_b.show()
         self.pass_b = gtk.Button("Pass")
         self.pass_b.connect("clicked", pass_turn, self.goban)
         self.pass_b.set_size_request(60,40)
-        self.pass_b.show()
         self.estimate_b=gtk.Button("Estimate\nScore")
         self.estimate_b.connect("clicked", estimate_score, self.goban)
         self.estimate_b.set_size_request(60,40)
-        self.estimate_b.show()
         self.time_window = gtk.Entry()
         self.label = gtk.Label("Time Remaining: White") #Displays time remaining for each player - TBI
         self.time_window.set_text("Time Placeholder")
@@ -328,9 +359,10 @@ class main_window:
         self.toolbar.append_widget(self.estimate_b,"Show estimate of current score","Private")
         self.toolbar.append_widget(self.time_window, "Show time remaining","Private")
         self.top_box.pack_start(self.toolbar,True,True,0)
-
-        self.top_box.show()  #Displays the sidepane
-        hpane.pack2(horiz_align,resize=True)
+        hpane.pack2(self.vpane,resize=True)
+        self.vpane.pack1(horiz_align,resize=True)
+        self.vpane.pack2(hs_win,resize=True)
+        self.vpane.set_position(300)
 
         self.window.add(hpane)
 
@@ -340,10 +372,9 @@ class main_window:
         self.stage.connect("button-press-event",button_press,self.goban)
 
         self.game_board_container.show()
-        hpane.show()
         self.toolbar.show()
         self.embed.show()
-        self.window.show()
+        self.window.show_all()
         self.mm = self.main_menu(0,None)
     def main(self):
         gtk.main()
