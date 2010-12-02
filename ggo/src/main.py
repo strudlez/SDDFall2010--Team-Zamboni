@@ -142,7 +142,7 @@ class main_window:
         print "To be implemented"
     def disp_history(self, widget, data):
         color,parent,move_num = data.split(' ')
-        self.goban.__update_stones(alt_board=self.goban.history[int(move_num)-1])
+        self.goban.update_stones(alt_board=self.goban.history[int(move_num)-1])
         print color
     def add_hist_button(self,move_num, parent, color):
         button = gtk.Button()
@@ -151,14 +151,14 @@ class main_window:
         button.connect("clicked", self.disp_history, "%s %s %s" % (color,parent,move_num))
         image = gtk.Image()
         if(color=="white"):
-	        pixbuf = gtk.gdk.pixbuf_new_from_file("white.png")
-	        scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
-	        image.set_from_pixbuf(scaled_buf)
-	
+            pixbuf = gtk.gdk.pixbuf_new_from_file("white.png")
+            scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
+            image.set_from_pixbuf(scaled_buf)
+    
         else:
-	        pixbuf = gtk.gdk.pixbuf_new_from_file("black.png")
-	        scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
-	        image.set_from_pixbuf(scaled_buf)
+            pixbuf = gtk.gdk.pixbuf_new_from_file("black.png")
+            scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
+            image.set_from_pixbuf(scaled_buf)
         image.show()
         label.show()
         box.pack_start(image, False, False, 3)
@@ -172,6 +172,9 @@ class main_window:
         if clear:
             goban.board.__init__()
             goban.update_stones()
+            for i in self.button_box.get_children(): i.destroy()
+            goban.history=[]
+            
         goban.board.gtp.level(difficulty)
         initialize_handicap(self.stage, goban)
         
