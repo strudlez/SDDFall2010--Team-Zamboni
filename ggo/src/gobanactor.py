@@ -47,8 +47,11 @@ class GobanActor(clutter.Group):
         stone.set_position(cx,cy)
         stone.show() #Adds the stone to our stage
 
-    def update_stones(self):
-        old_stones = self.stones
+    def update_stones(self, alt_board=None):
+        temp_stones=self.board.stones
+        if(alt_board!=None):
+            temp_stones=alt_board 
+        old_stones = self.stones  #Keep a record of our previous stones
         self.stones = {}
         
         for p in old_stones: #Remove all stones currently on the board
@@ -59,13 +62,13 @@ class GobanActor(clutter.Group):
             for y in range(20):
                 vertex = engine.goutil.coords_to_vertex(x,y) #Gets a location to place the stone at.
                 vertex2 = engine.goutil.coords_to_vertex(x,y+1) #Gets a location for the purpose of checking number of liberties.
-                if self.board.stones[x][y] == 'w': #If the stone at the current board position is white
+                if temp_stones[x][y] == 'w': #If the stone at the current board position is white
                     if(self.board.count_liberties(vertex2)=='1'): 
                         stone = Stone("white_c",x,y) #If the stone has one liberty, display the warning piece instead of the normal piece
                     else:
                         stone = Stone("white",x,y) #Display the normal stone
                     self.stones[vertex] = stone
-                elif self.board.stones[x][y] == 'b': #if the stone is black
+                elif temp_stones[x][y] == 'b': #if the stone is black
                     if(self.board.count_liberties(vertex2)=='1'): #Follows as if the stone was white, see above.
                         stone = Stone("black_c",x,y)
                     else:
@@ -74,6 +77,13 @@ class GobanActor(clutter.Group):
 
         for stone in self.stones:
             self.__place_stone(self.stones[stone]) #Place all stones on the board
+        if(alt_board==None):
+            self.history.append(self.board.stones) #Keep track of the history for review
+            self.window.add_hist_button(len(self.history), 1, self.current_color)
+        if(self.current_color=="black"):
+            self.current_color="white"
+        else:
+            self.current_color="black"
                     
  
 
@@ -134,12 +144,18 @@ class GobanActor(clutter.Group):
     def set_time(self, time, bytime):  #Sets the amount of time for each player
         return self.board.set_time(time, bytime)
 
-    def __init__(self, board): #Creates the visible board, sets up our array of stones, and creates an instance of the board class to work with
+    def __init__(self, board, window): #Creates the visible board, sets up our array of stones, and creates an instance of the board class to work with
         clutter.Group.__init__(self)#,*args)
+        
+        self.current_color="black"
         
         self.stones = {}
         
         self.board = board
+    
+        self.window = window
+    
+        self.history = []
 
         
         self.set_size(700,700) 
