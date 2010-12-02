@@ -223,12 +223,12 @@ class main_window:
         dialog.set_title("Main Menu")
         local_b=gtk.Button("Local Play") #Button for local play
         local_b.connect("clicked", self.start_local, self.goban, dialog)
-        local_b.set_size_request(60,40)
+        local_b.set_size_request(120,60)
         local_b.show()
         dialog.vbox.pack_start(local_b)
         ai_b=gtk.Button("AI Play") #Button for AI play
         ai_b.connect("clicked", self.start_ai, self.goban, dialog)
-        ai_b.set_size_request(60,40)
+        ai_b.set_size_request(120,60)
         ai_b.show()
         dialog.vbox.pack_start(ai_b)
         dialog.run()
@@ -389,13 +389,13 @@ class main_window:
 
         self.forfeit_b=gtk.Button("Forfeit")  #Sets up a Forfeit, Pass, and Estimate Score button for the sidepane
         self.forfeit_b.connect("clicked", forfeit_game, self.goban)
-        self.forfeit_b.set_size_request(60,40)
+        self.forfeit_b.set_size_request(80,50)
         self.pass_b = gtk.Button("Pass")
         self.pass_b.connect("clicked", pass_turn, self.goban)
-        self.pass_b.set_size_request(60,40)
+        self.pass_b.set_size_request(80,50)
         self.estimate_b=gtk.Button("Estimate\nScore")
         self.estimate_b.connect("clicked", estimate_score, self.goban)
-        self.estimate_b.set_size_request(60,40)
+        self.estimate_b.set_size_request(80,50)
         
         
         self.time_white_label = gtk.Label("White: ") #Displays time remaining for each player - TBI
