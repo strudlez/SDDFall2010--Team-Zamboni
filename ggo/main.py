@@ -33,6 +33,36 @@ class main_window:
 		pass
 	def save_game(self,w,data):
 		pass
+	def disp_history(self, widget, data):
+		color,parent,move_num=data.split(' ')
+		self.goban._update_stones(alt_board=self.goban.history[int(move_num)-1])
+		
+		print color
+	def add_hist_button(self,move_num, parent, color):
+		button = gtk.Button()
+		label = gtk.Label("%d "%move_num)
+		box = gtk.HBox(False, 0)
+		button.connect("clicked", self.disp_history, "%s %s %s" % (color,parent,move_num))
+		image = gtk.Image()
+		if(color=="white"):
+			pixbuf = gtk.gdk.pixbuf_new_from_file("white.png")
+			scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
+			image.set_from_pixbuf(scaled_buf)
+			
+		else:
+			pixbuf = gtk.gdk.pixbuf_new_from_file("black.png")
+			scaled_buf = pixbuf.scale_simple(18,18,gtk.gdk.INTERP_BILINEAR)
+			image.set_from_pixbuf(scaled_buf)
+		image.show()
+		label.show()
+		box.pack_start(image, False, False, 3)
+		box.pack_start(label, False, False, 1)
+		button.add(box)
+		box.show()
+		button.set_size_request(28,24)
+		button.show()
+		self.button_box.pack_start(button, False, False, 5)
+
 	def settings_window(self,w,data):
 		dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
 		dialog.set_title("Settings")
@@ -96,7 +126,7 @@ class main_window:
 		self.embed = cluttergtk.Embed()
 		
 		menubar=self.create_menu_bar(self.window)
-		menubar.show()
+		
 		self.toolbar = gtk.Toolbar()
 		self.toolbar2 = gtk.Toolbar()
 		self.game_board_container=gtk.HandleBox()
@@ -104,6 +134,10 @@ class main_window:
 		self.toolbar.set_style(gtk.TOOLBAR_BOTH)
 		
 		self.top_box = gtk.VBox(False,2)
+		
+		self.button_box = gtk.HBox(False,2)#for history buttons
+		hist_buttons_align=gtk.Alignment(0,0,1,0)
+		
 		self.menu_box = gtk.HBox(False,2)
 		horiz_align = gtk.Alignment(0,0,1,0)
 		
@@ -113,66 +147,70 @@ class main_window:
 		self.top_box.pack_start(separator,False,True,5)
 		
 		horiz_align.add(self.top_box)
-		horiz_align.show()
-		self.menu_box.show()
-		separator.show()
-
+		hist_buttons_align.add(self.button_box)
 		
 		self.embed.realize()
-		self.window.set_size_request(900, 700)
+		self.window.set_size_request(1200, 700)
 		hpane = gtk.HPaned()
-		
+		self.vpane = gtk.VPaned()
 		
 		s_win = gtk.ScrolledWindow()
 		s_win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		s_win.add_with_viewport(self.embed)
 		s_win.set_size_request(700, 700)
-		s_win.show()
 		
+		
+		hs_win = gtk.ScrolledWindow()
+		hs_win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		hs_win.add_with_viewport(hist_buttons_align)
+		hs_win.set_size_request(700, 700)
+
+
 		self.game_board_container.add(s_win)
 		#self.game_board_container.connect('child-detached', self.wrap_window, self.game_board_container)
 		hpane.pack1(self.game_board_container, resize=True)
 		hpane.set_position(700)
-		
-		
+			
 		self.stage = self.embed.get_stage() 
 		self.stage.set_size(700,700)
 		
 		board = engine.board.Board()
-		goban = gobanactor.GobanActor(board)
-		self.stage.add(goban)
+		self.goban = gobanactor.GobanActor(board,self)
+		self.stage.add(self.goban)
 		
 		self.forfeit_b=gtk.Button("Forfeit")
 		self.forfeit_b.set_size_request(60,40)
-		self.forfeit_b.show()
+
 		self.pass_b = gtk.Button("Pass")
 		self.pass_b.set_size_request(60,40)
-		self.pass_b.show()
+
 		self.estimate_b=gtk.Button("Estimate\nScore")
 		self.estimate_b.set_size_request(60,40)
-		self.estimate_b.show()
-
 		
 		self.toolbar.append_widget(self.forfeit_b,"End Game","Private")
 		self.toolbar.append_widget(self.pass_b,"Pass Turn","Private")
 		self.toolbar.append_widget(self.estimate_b,"Show estimate of current score","Private")
 		self.top_box.pack_start(self.toolbar,True,True,0)
 		
-		self.top_box.show()
-		hpane.pack2(horiz_align,resize=True)
+
+		hpane.pack2(self.vpane,resize=True)
+		self.vpane.pack1(horiz_align,resize=True)
+		self.vpane.pack2(hs_win,resize=True)
+		
+		self.vpane.set_position(300)
 		
 		self.window.add(hpane)
 		
 		self.embed.show_all()
 		
 		self.stage.connect("delete-event",quit)
-		self.stage.connect("button-press-event",button_press,goban)
+		self.stage.connect("button-press-event",button_press,self.goban)
 		
 		self.game_board_container.show()
-		hpane.show()
+
 		self.toolbar.show()
 		self.embed.show()
-		self.window.show()
+		self.window.show_all()
 
 	def main(self):
 		gtk.main()

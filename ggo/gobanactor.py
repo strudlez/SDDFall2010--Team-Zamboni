@@ -31,7 +31,11 @@ class GobanActor(clutter.Group):
 		stone.set_position(cx,cy)
 		stone.show()
 
-    def __update_stones(self):
+    def _update_stones(self, alt_board=None):
+        stones=self.board.stones
+        if(alt_board!=None):
+			stones=alt_board
+        
         old_stones = self.stone_actors
         self.stone_actors = {}
         
@@ -43,7 +47,7 @@ class GobanActor(clutter.Group):
             for y in range(19):
                 vertex = engine.goutil.coords_to_vertex(x,y)
                 vertex2 = engine.goutil.coords_to_vertex(x,y+1)
-                if self.board.stones[x][y] == 'w':
+                if stones[x][y] == 'w':
 					if((self.stone_actors.has_key(vertex))==False):
 						color="white"
 						try:
@@ -53,7 +57,7 @@ class GobanActor(clutter.Group):
 							pass
 						stone = Stone(color,x,y)
 						self.stone_actors[vertex] = stone
-                elif self.board.stones[x][y] == 'b':
+                elif stones[x][y] == 'b':
 					if((self.stone_actors.has_key(vertex))==False):
 						color="black"
 						try:
@@ -64,12 +68,16 @@ class GobanActor(clutter.Group):
 						stone = Stone(color,x,y)
 						self.stone_actors[vertex] = stone
 						
-
         for stone in self.stone_actors:
             self.__place_stone(self.stone_actors[stone])
-                    
- 
-
+        if(alt_board==None):
+			self.history.append(self.board.stones)#keep track of the history for review
+			self.window.add_hist_button(len(self.history), 1, self.current_color)
+        
+        if(self.current_color=="black"):
+			self.current_color="white"
+        else:
+			self.current_color="black"
             
     def __intersection_from_position(self,cx,cy):
 
@@ -97,7 +105,7 @@ class GobanActor(clutter.Group):
     def place_stone(self, color, x, y):
         
         if self.board.make_move(color, x, y):
-            self.__update_stones()
+            self._update_stones()
             return True
         
         return False
@@ -106,13 +114,18 @@ class GobanActor(clutter.Group):
         (x,y) = self.__intersection_from_position(cx,cy)
         return self.place_stone(Color,x,y)
 
-    def __init__(self, board):
+    def __init__(self, board, window):
         clutter.Group.__init__(self)#,*args)
+        
+        self.current_color="black"
         
         self.stone_actors = {}
         
         self.board = board
-
+        
+        self.window=window
+		
+        self.history = []
         
         self.set_size(700,700)
         self.background = clutter.Texture("goban.png")
