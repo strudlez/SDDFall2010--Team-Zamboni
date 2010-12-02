@@ -169,11 +169,34 @@ class main_window:
             #print goban.board.gtp.time_left("black")
         gobject.timeout_add(500,self.update_timer,goban)
         
+    def set_history(self, widget, data):
+		move=self.place_in_hist
+		print "Move is..."
+		print move
+		hist_remove_btn=self.goban.set_board(move)#Set the board back to this move
+		print "Buttons to remove..."
+		print hist_remove_btn
+		count=0
+		while count!=hist_remove_btn:
+			last_btn=self.button_box.get_children().pop()
+			last_btn.destroy()
+			count=count+1
+		global last_color
+		if(int(move)%2 == 0):
+			last_color="white"
+			self.goban.current_color="black"
+		else:
+			last_color="black"
+			self.goban.current_color="white"
+			
+			
     def disp_history(self, widget, data):
         color,parent,move_num = data.split(' ')
+        self.place_in_hist=move_num
         self.goban.update_stones(alt_board=self.goban.history[int(move_num)-1])
         print color
     def add_hist_button(self,move_num, parent, color):
+        self.place_in_hist=int(self.place_in_hist)+1
         button = gtk.Button()
         label = gtk.Label("%d "%move_num)
         box = gtk.HBox(False, 0)
@@ -220,15 +243,16 @@ class main_window:
         
     def main_menu(self, w, data): #Initializes the main menu of game modes
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
+        dialog.set_size_request(150,90)
         dialog.set_title("Main Menu")
         local_b=gtk.Button("Local Play") #Button for local play
         local_b.connect("clicked", self.start_local, self.goban, dialog)
-        local_b.set_size_request(60,40)
+        local_b.set_size_request(70,40)
         local_b.show()
         dialog.vbox.pack_start(local_b)
         ai_b=gtk.Button("AI Play") #Button for AI play
         ai_b.connect("clicked", self.start_ai, self.goban, dialog)
-        ai_b.set_size_request(60,40)
+        ai_b.set_size_request(70,40)
         ai_b.show()
         dialog.vbox.pack_start(ai_b)
         dialog.run()
@@ -315,7 +339,7 @@ class main_window:
         return item_factr.get_widget("<main>")
     
     def __init__(self):
-        
+        self.place_in_hist=0
         self.menu_items = (( "/_File",         None,         None, 0, "<Branch>" ), #Sets up the menu items for future use
         ( "/File/_New Game","<control>N", self.new_game, 0, None ),
         ( "/File/_New Teaching Game","<control>T", self.new_teach_game, 0, None ),
@@ -357,12 +381,17 @@ class main_window:
         hist_buttons_align.add(self.button_box)
 
 
+		
         self.embed.realize()
         self.window.set_size_request(1200, 700)
         hpane = gtk.HPaned()
         self.vpane = gtk.VPaned()
 
-
+		#Undo History Button
+        undo = gtk.Button("Undo")
+        undo.connect("clicked", self.set_history, self.place_in_hist)
+        self.button_box.pack_start(undo, False, False, 5)
+		
         s_win = gtk.ScrolledWindow()
         s_win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         s_win.add_with_viewport(self.embed)

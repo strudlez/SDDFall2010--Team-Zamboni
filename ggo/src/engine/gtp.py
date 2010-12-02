@@ -129,6 +129,9 @@ class gtp:
         self.tx('level %d' % lvl)
         return self.rx()
      
+    def undo(self, num_moves): #Undoes specified number of moves
+		self.tx('gg-undo %d' % num_moves)
+		return self.rx()
     def genmove(self, color, callback): #Generates a move by the Ai
         self.waiting = True
         self.callback = callback

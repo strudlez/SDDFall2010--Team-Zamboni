@@ -47,7 +47,17 @@ class GobanActor(clutter.Group):
         self.add(stone) 
         stone.set_position(cx,cy)
         stone.show() #Adds the stone to our stage
-
+	
+    def set_board(self,move):#sets the board to a specific state
+		self.board.stones=self.history[int(move)-1]
+		cur_move_num = len(self.history)
+		num_moves_undo=int(cur_move_num)-int(move)
+		self.board.gtp.undo(num_moves_undo)
+		
+		self.history = self.history[0:int(move)]#Set history back to the undo point
+		
+		return num_moves_undo
+		
     def update_stones(self, alt_board=None):
         temp_stones=self.board.stones
         if(alt_board!=None):
