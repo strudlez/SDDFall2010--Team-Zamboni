@@ -129,15 +129,22 @@ class main_window:
     def new_game(self,w,data):
         global game_mode
         game_mode = "local"
+        self.settings = self.settings_window(0,None, clear=1)
+        
     def new_teach_game(self,w,data):
         global game_mode
         game_mode = "ai"
+        self.settings = self.settings_window(0,None, clear=1)
         
     def load_game(self,w,data):
         print "To be implemented"
     def save_game(self,w,data):
         print "To be implemented"
-    def start_game(self, stage, goban,dialog): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
+    def start_game(self, stage, goban,dialog,clear=1): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
+        if clear:
+            goban.board.__init__()
+            goban.update_stones()
+            
         goban.board.gtp.level(difficulty)
         initialize_handicap(self.stage, goban)
         dialog.destroy()
@@ -167,7 +174,7 @@ class main_window:
         game_mode = "ai"
         dialog.destroy()
         self.settings = self.settings_window(0,None)
-    def settings_window(self,w,data): #Creates a window with radio buttons for handicap stone number and text entry fields to desired amount of time and byo-yomi time
+    def settings_window(self,w,data, clear=0): #Creates a window with radio buttons for handicap stone number and text entry fields to desired amount of time and byo-yomi time
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
         dialog.set_title("Settings")
         self.time_entry = gtk.Entry() #Prepares the text entry fields
@@ -214,7 +221,7 @@ class main_window:
 
         
         accept_b=gtk.Button("Accept") #Accept button to finalize setting choices
-        accept_b.connect("clicked", self.start_game, self.goban, dialog)
+        accept_b.connect("clicked", self.start_game, self.goban, dialog, clear)
         accept_b.set_size_request(60,40)
         accept_b.show()
         dialog.vbox.pack_start(accept_b)

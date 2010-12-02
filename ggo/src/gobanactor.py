@@ -40,7 +40,7 @@ class GobanActor(clutter.Group):
         stone.set_position(cx,cy)
         stone.show()
 
-    def __update_stones(self):
+    def update_stones(self):
         old_stones = self.stones
         self.stones = {}
         
@@ -92,14 +92,14 @@ class GobanActor(clutter.Group):
     def place_stone(self, color, x, y):
         
         if self.board.make_move(color, x, y):
-            self.__update_stones()
+            self.update_stones()
             return True
         
         return False
         
     def place_stone_gnugo(self, color, callback):
         def stone_placed(vertex):
-            self.__update_stones()
+            self.update_stones()
             callback(vertex)
         self.board.make_gnugo_move(color, stone_placed)
         return True
