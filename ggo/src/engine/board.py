@@ -89,4 +89,8 @@ class Board:
             callback(response)
         self.gtp.genmove(color, gnugo_done)
         return True
+
+    def count_liberties(self, vertex):
+        return self.gtp.count_liberties(vertex)
+        
         

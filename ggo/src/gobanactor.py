@@ -25,8 +25,12 @@ class Stone(clutter.Texture):
 
         if color == "black":
             self.set_from_file("black.png")
-        else:
+        elif color == "black_c":
+            self.set_from_file("black_c.png")
+        elif color == "white":
             self.set_from_file("white.png")
+        else:
+            self.set_from_file("white_c.png")
         self.set_size(40,40)
         self.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
 
@@ -51,11 +55,19 @@ class GobanActor(clutter.Group):
         for x in range(20):
             for y in range(20):
                 vertex = engine.goutil.coords_to_vertex(x,y)
+                vertex2 = engine.goutil.coords_to_vertex(x,y+1)
                 if self.board.stones[x][y] == 'w':
-                    stone = Stone("white",x,y)
+                    if(self.board.count_liberties(vertex2)=='1'):
+                        print "herp"
+                        stone = Stone("white_c",x,y)
+                    else:
+                        stone = Stone("white",x,y)
                     self.stones[vertex] = stone
                 elif self.board.stones[x][y] == 'b':
-                    stone = Stone("black",x,y)
+                    if(self.board.count_liberties(vertex2)=='1'):
+                        stone = Stone("black_c",x,y)
+                    else:
+                        stone = Stone("black",x,y)
                     self.stones[vertex] = stone
 
         for stone in self.stones:

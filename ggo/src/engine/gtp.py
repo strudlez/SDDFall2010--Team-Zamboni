@@ -116,6 +116,10 @@ class gtp:
         self.tx('estimate_score')
         return self.rx()
 
+    def count_liberties(self, vertex):
+		self.tx('countlib ' + vertex)
+		return self.rx()
+
     def time_settings(self, time, bytime, bystones):
         self.tx('time_settings ' + str(time) + ' ' + str(bytime) + ' ' + str(bystones))
         return self.rx()
