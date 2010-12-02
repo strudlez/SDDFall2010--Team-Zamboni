@@ -47,7 +47,7 @@ class GobanActor(clutter.Group):
         stone.set_position(cx,cy)
         stone.show() #Adds the stone to our stage
 
-    def __update_stones(self, alt_board=None):
+    def update_stones(self, alt_board=None):
         temp_stones=self.board.stones
         if(alt_board!=None):
             temp_stones=alt_board 
@@ -115,15 +115,15 @@ class GobanActor(clutter.Group):
         
     def place_stone(self, color, x, y): #Attempts to place a stone at the requested vertex
         
-        if self.board.make_move(color, x, y): #If the move succeeds, update the stones
-            self.__update_stones()
+        if self.board.make_move(color, x, y):
+            self.update_stones()
             return True
         
         return False
         
     def place_stone_gnugo(self, color, callback): #Has the AI place a stone.
         def stone_placed(vertex):
-            self.__update_stones()
+            self.update_stones()
             callback(vertex)
         self.board.make_gnugo_move(color, stone_placed)
         return True
