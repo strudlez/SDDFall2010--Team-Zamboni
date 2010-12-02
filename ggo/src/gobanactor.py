@@ -15,6 +15,7 @@
 import clutter
 import engine.board
 import engine.goutil
+from timer import Timer
 
 
 #Stone is a class which stores a stone's color, it's location, and displays it on the screen
@@ -122,7 +123,11 @@ class GobanActor(clutter.Group):
         return False
         
     def place_stone_gnugo(self, color, callback): #Has the AI place a stone.
+        other = "black" if color=="white" else "white"
+        self.timers[color].start()
         def stone_placed(vertex):
+            self.timers[color].stop()
+            self.timers[other].start()
             self.update_stones()
             callback(vertex)
         self.board.make_gnugo_move(color, stone_placed)
@@ -139,9 +144,11 @@ class GobanActor(clutter.Group):
         return self.board.final_score()
 
     def get_time(self, color): #Gets the amount of time remaining for the player of the requested color
-        return self.board.get_time(color)
+        return self.timers[color].get_time()
+        #return self.board.get_time(color)
 
     def set_time(self, time, bytime):  #Sets the amount of time for each player
+        for i in self.timers.values(): i.set_time(time,bytime)
         return self.board.set_time(time, bytime)
 
     def __init__(self, board, window): #Creates the visible board, sets up our array of stones, and creates an instance of the board class to work with
@@ -154,6 +161,8 @@ class GobanActor(clutter.Group):
         self.board = board
     
         self.window = window
+        
+        self.timers={"black":Timer(), "white": Timer()}
     
         self.history = []
 

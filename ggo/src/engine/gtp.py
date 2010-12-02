@@ -17,7 +17,7 @@ import gobject
 import glib
 import shlex, subprocess
 
-#GTP(Gnu Text Protocol), is the text protocol used to communicate with GnuGo.  Our gtp class provides us with functions that will request actions of GnuGo and report the results.
+#GTP(Go Text Protocol), is the text protocol used to communicate with GnuGo.  Our gtp class provides us with functions that will request actions of GnuGo and report the results.
 class gtp:
     def __gnugo_write_callback (self, source, condition): #Returns the output GnuGo to a callback function
         if self.waiting == True:
@@ -114,15 +114,15 @@ class gtp:
         return self.rx()
 
     def count_liberties(self, vertex): #Returns the number of liberties for the stone at the given vertex
-		self.tx('countlib ' + vertex)
-		return self.rx()
+        self.tx('countlib ' + vertex)
+        return self.rx()
 
     def time_settings(self, time, bytime, bystones): #Sets the time for each player
         self.tx('time_settings ' + str(time) + ' ' + str(bytime) + ' ' + str(bystones))
         return self.rx()
 
     def time_left(self,color): #Returns the time left for the player of the requested color
-        self.tx('time_left ' + color + ' 11 3')
+        self.tx('time_left %s 11 3' % color)
         return self.rx()
     
     def level(self, lvl): #Sets the Ai level
