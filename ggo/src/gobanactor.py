@@ -16,67 +16,69 @@ import clutter
 import engine.board
 import engine.goutil
 
+
+#Stone is a class which stores a stone's color, it's location, and displays it on the screen
 class Stone(clutter.Texture):
     def __init__(self,color,x,y):
         clutter.Texture.__init__(self)
 
-        self.x = x
+        #Sets the location of the stone
+        self.x = x  
         self.y = y
 
-        if color == "black":
-            self.set_from_file("black.png")
+        if color == "black": 
+            self.set_from_file("black.png") #Loads black stone image
         elif color == "black_c":
-            self.set_from_file("black_c.png")
+            self.set_from_file("black_c.png") #Loads black stone with 1 liberty image
         elif color == "white":
-            self.set_from_file("white.png")
+            self.set_from_file("white.png") #Loads white stone image
         else:
-            self.set_from_file("white_c.png")
+            self.set_from_file("white_c.png") #Loads white stone with 1 liberty image
         self.set_size(40,40)
         self.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
 
 
-
+#GobanActor is our high-level graphical board.  This class passes instructions from the user down to board, and takes the information from board to display stones properly
 class GobanActor(clutter.Group):
     def __place_stone(self, stone):
-        (cx, cy) = self.__intersection_to_position(stone.x,stone.y+1)
+        (cx, cy) = self.__intersection_to_position(stone.x,stone.y+1) #Gets the location of a stone on our board
         
-        self.add(stone)
+        self.add(stone) 
         stone.set_position(cx,cy)
-        stone.show()
+        stone.show() #Adds the stone to our stage
 
-    def __update_stones(self):
-        old_stones = self.stones
+    def __update_stones(self): 
+        old_stones = self.stones  #Keep a record of our previous stones
         self.stones = {}
         
-        for p in old_stones:
+        for p in old_stones: #Remove all stones currently on the board
             stone = old_stones[p]
             stone.get_parent().remove(stone)
             
-        for x in range(20):
+        for x in range(20): #Cycle through all on-board locations
             for y in range(20):
-                vertex = engine.goutil.coords_to_vertex(x,y)
-                vertex2 = engine.goutil.coords_to_vertex(x,y+1)
-                if self.board.stones[x][y] == 'w':
-                    if(self.board.count_liberties(vertex2)=='1'):
-                        print "herp"
-                        stone = Stone("white_c",x,y)
+                vertex = engine.goutil.coords_to_vertex(x,y) #Gets a location to place the stone at.
+                vertex2 = engine.goutil.coords_to_vertex(x,y+1) #Gets a location for the purpose of checking number of liberties.
+                if self.board.stones[x][y] == 'w': #If the stone at the current board position is white
+                    if(self.board.count_liberties(vertex2)=='1'): 
+                        stone = Stone("white_c",x,y) #If the stone has one liberty, display the warning piece instead of the normal piece
                     else:
-                        stone = Stone("white",x,y)
+                        stone = Stone("white",x,y) #Display the normal stone
                     self.stones[vertex] = stone
-                elif self.board.stones[x][y] == 'b':
-                    if(self.board.count_liberties(vertex2)=='1'):
+                elif self.board.stones[x][y] == 'b': #if the stone is black
+                    if(self.board.count_liberties(vertex2)=='1'): #Follows as if the stone was white, see above.
                         stone = Stone("black_c",x,y)
                     else:
                         stone = Stone("black",x,y)
                     self.stones[vertex] = stone
 
         for stone in self.stones:
-            self.__place_stone(self.stones[stone])
+            self.__place_stone(self.stones[stone]) #Place all stones on the board
                     
  
 
             
-    def __intersection_from_position(self,cx,cy):
+    def __intersection_from_position(self,cx,cy): #Convert the coordinates of the stone into a column and row number
 
         ratio = 700/2000.0
         border_width = 60*ratio
@@ -88,7 +90,7 @@ class GobanActor(clutter.Group):
         y = round((cy-border_width)/(space_height+line_width))+1
         return (int(x),int(y))
 
-    def __intersection_to_position(self, x, y):
+    def __intersection_to_position(self, x, y): #Convert the column and row number of a stone into a location on the board
 
         ratio = 700/2000.0
         border_width = 60*ratio
@@ -101,38 +103,38 @@ class GobanActor(clutter.Group):
         
         return (cx,cy)
         
-    def place_stone(self, color, x, y):
+    def place_stone(self, color, x, y): #Attempts to place a stone at the requested vertex
         
-        if self.board.make_move(color, x, y):
+        if self.board.make_move(color, x, y): #If the move succeeds, update the stones
             self.__update_stones()
             return True
         
         return False
         
-    def place_stone_gnugo(self, color, callback):
+    def place_stone_gnugo(self, color, callback): #Has the AI place a stone.
         def stone_placed(vertex):
             self.__update_stones()
             callback(vertex)
         self.board.make_gnugo_move(color, stone_placed)
         return True
         
-    def place_stone_at_position(self, Color, cx, cy):
-        (x,y) = self.__intersection_from_position(cx,cy)
-        return self.place_stone(Color,x,y)
+    def place_stone_at_position(self, Color, cx, cy): #When the user clicks the board
+        (x,y) = self.__intersection_from_position(cx,cy)  #Convert the click coordinates to a vertex
+        return self.place_stone(Color,x,y) #Place a stone at the vertex
 
-    def estimate_score(self):
+    def estimate_score(self): #Returns GnuGo's estimate of the score
         return self.board.estimate_score()
 
-    def final_score(self):
+    def final_score(self): #Returns the final score of the game
         return self.board.final_score()
 
-    def get_time(self, color):
+    def get_time(self, color): #Gets the amount of time remaining for the player of the requested color
         return self.board.get_time(color)
 
-    def set_time(self, time, bytime):
+    def set_time(self, time, bytime):  #Sets the amount of time for each player
         return self.board.set_time(time, bytime)
 
-    def __init__(self, board):
+    def __init__(self, board): #Creates the visible board, sets up our array of stones, and creates an instance of the board class to work with
         clutter.Group.__init__(self)#,*args)
         
         self.stones = {}
@@ -140,10 +142,10 @@ class GobanActor(clutter.Group):
         self.board = board
 
         
-        self.set_size(700,700)
-        self.background = clutter.Texture("goban.png")
-        self.background.set_size(700,700)
-        self.background.set_position(0,0)
-        self.add(self.background)
+        self.set_size(700,700) 
+        self.background = clutter.Texture("goban.png") #Loads the image of a board
+        self.background.set_size(700,700) #Sets the size of our board image
+        self.background.set_position(0,0)  #Sets the position of the board image
+        self.add(self.background)#Displays the board
 
         self.show_all()

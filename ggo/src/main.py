@@ -6,7 +6,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import cluttergtk
-
+#This is our initialiazation, ui, and user input file.
 last_color = "white"
 game_mode = "local"
 handicap = 0
@@ -14,10 +14,9 @@ difficulty = 1
 time = 60
 bytime = 10
 
-def gnugo_played(vertex):
-    global last_color
-    global pass_count
-    last_color = "white"
+def gnugo_played(vertex): #Called after GnuGo places a stone
+    global last_color 
+    last_color = "white" #The last color is set to white, GnuGo's color
 
 def button_press(stage, event, goban):
     global last_color
@@ -110,8 +109,9 @@ def initialize_handicap(stage, goban): #Place stones at the typical positions in
         goban.place_stone_at_position("black", x_pos[0], y_pos[1])
         goban.place_stone_at_position("black", x_pos[2], y_pos[2])
         goban.place_stone_at_position("black", x_pos[0], y_pos[2])
-    if handicap >= 0:
+    if handicap > 0:
         if game_mode == "ai": #If game mode is AI, the AI, being white, immediately plays
+            print(handicap)
             goban.place_stone_gnugo("white", gnugo_played)
         if game_mode == "local": #If game mode is local, switch the next piece placed to white
             last_color = "black"
@@ -126,16 +126,16 @@ class main_window:
         gtk.main_quit()
     def delete_evt(self,widget,event, data=None):
         pass
-    def new_game(self,w,data):
+    def new_game(self,w,data): #Sets the game mode to local
         global game_mode
         game_mode = "local"
-    def new_teach_game(self,w,data):
+    def new_teach_game(self,w,data): #Sets the game mode to AI
         global game_mode
         game_mode = "ai"
         
-    def load_game(self,w,data):
+    def load_game(self,w,data): #For viewing past games
         print "To be implemented"
-    def save_game(self,w,data):
+    def save_game(self,w,data): #For recording games
         print "To be implemented"
     def start_game(self, stage, goban,dialog): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
         goban.board.gtp.level(difficulty)
@@ -157,12 +157,12 @@ class main_window:
         dialog.vbox.pack_start(ai_b)
         dialog.run()
         dialog.destroy()
-    def start_local(self, stage, goban, dialog):
+    def start_local(self, stage, goban, dialog): #Starts a game in local mode
         global game_mode
         game_mode = "local"
         dialog.destroy()
         self.settings = self.settings_window(0,None)
-    def start_ai(self, stage, goban, dialog):
+    def start_ai(self, stage, goban, dialog): #Starts a game in AI mode
         global game_mode
         game_mode = "ai"
         dialog.destroy()
