@@ -135,10 +135,10 @@ class GobanActor(clutter.Group):
         
     def place_stone_gnugo(self, color, callback): #Has the AI place a stone.
         other = "black" if color=="white" else "white"
-        self.timers[color].start()
+        self.timers[color].start() #start ai's timer
         def stone_placed(vertex):
-            self.timers[color].stop()
-            self.timers[other].start()
+            self.timers[color].stop() #stop ai's timer
+            self.timers[other].start() #start player's timer
             self.update_stones()
             callback(vertex)
         self.board.make_gnugo_move(color, stone_placed)

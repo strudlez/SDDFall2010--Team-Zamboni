@@ -35,12 +35,12 @@ def button_press(stage, event, goban):
                 last_color = "white"
             if goban.place_stone_at_position(last_color,event.x,event.y):
                 if last_color!="gameOver":
-                    goban.timers[last_color].stop()
-                    goban.timers[col].start()
+                    goban.timers[last_color].stop() #stop last player's timer
+                    goban.timers[col].start() #start current player's timer
     if game_mode == "ai": #If we are playing in AI mode, the player plays black, and then the AI plays white
         if last_color == "white":
             if goban.place_stone_at_position("black",event.x,event.y):
-                goban.timers["black"].stop()
+                goban.timers["black"].stop() #stop player's timer
                 last_color == "black"
                 goban.place_stone_gnugo("white",gnugo_played)
 
@@ -66,6 +66,7 @@ def pass_turn(stage,goban): #Functionality for the pass button in the sidepane -
                 forfeit_game(stage, goban)
                 goban.timers["white"].stop()
                 goban.timers["black"].stop()
+                #Stop timers
             if pass_count == 0:
                 goban.timers[last_color].start()
                 if last_color == "white":
@@ -220,6 +221,7 @@ class main_window:
         button.show()
         self.button_box.pack_start(button, False, False, 5)
     def start_game(self, stage, goban,dialog,clear=1): #Places handicap stones and initializes the game clock based on the choices made in the settings window.
+        #clear the board
         if clear:
             goban.board.__init__()
             goban.update_stones()
@@ -236,6 +238,7 @@ class main_window:
         
         set_time(self.stage, goban, self.time_entry.get_text(), self.by_entry.get_text())
         
+        #start the current player's timer
         goban.timers["white" if last_color=="black" else "black"].start()
         
         dialog.destroy()
@@ -430,15 +433,16 @@ class main_window:
         self.estimate_b.set_size_request(80,50)
         
         
-        self.time_white_label = gtk.Label("White: ") #Displays time remaining for each player - TBI
-        self.time_black_label = gtk.Label("Black: ") #Displays time remaining for each player - TBI
-        #self.time_window.set_text("Time Placeholder")
+        #Timer labels
+        self.time_white_label = gtk.Label("White: ")
+        self.time_black_label = gtk.Label("Black: ")
         self.time_white_label.show()
         self.time_black_label.show()
         
         self.time_white = gtk.Entry()
         self.time_black = gtk.Entry()
         
+        #Timers
         self.time_white.set_editable(False)
         self.time_black.set_editable(False)
         
