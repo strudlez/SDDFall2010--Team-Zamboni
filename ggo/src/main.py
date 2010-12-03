@@ -157,7 +157,8 @@ class main_window:
         print "To be implemented"
         
         
-    def update_timer(self,goban):
+    
+    def update_timer(self,goban): #Gets the current timer for both players, and forfeits if one runs out.  Reruns itself every half-second
         if last_color!="gameOver" and goban.timers['white'].inited and goban.timers['black'].inited:
             for color in ["white","black"]:
                 time=goban.timers[color].get_time_str()
@@ -165,8 +166,6 @@ class main_window:
                 if color=="white":self.time_white.set_text(time)
                 elif color=="black":self.time_black.set_text(time)
             
-            #print goban.board.gtp.time_left("white")
-            #print goban.board.gtp.time_left("black")
         gobject.timeout_add(500,self.update_timer,goban)
         
     def set_history(self, widget, data):
