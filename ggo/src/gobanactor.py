@@ -89,12 +89,13 @@ class GobanActor(clutter.Group):
         for stone in self.stones:
             self.__place_stone(self.stones[stone]) #Place all stones on the board
         if(alt_board==None):
-            self.history.append(self.board.stones) #Keep track of the history for review
-            self.window.add_hist_button(len(self.history), 1, self.current_color)
-        if(self.current_color=="black"):
-            self.current_color="white"
-        else:
-            self.current_color="black"
+			if(len(self.history)%2 == 0):
+				self.current_color="white"
+			else:
+				self.current_color="black"
+			self.history.append(self.board.stones) #Keep track of the history for review
+			self.window.add_hist_button(len(self.history), 1, self.current_color)
+        
                     
  
 
