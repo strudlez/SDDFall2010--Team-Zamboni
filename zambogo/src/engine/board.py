@@ -13,7 +13,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
 
 import zambogo.engine.gtp.gtp
-import goutil
+import zambogo.engine.goutil
 
 class Board:
     def __clear_stones(self):
@@ -29,7 +29,7 @@ class Board:
         for vertex in stone_list.split(' '):
             if len(vertex) < 2:
                 continue
-            (x,y) = goutil.coords_from_vertex(vertex)
+            (x,y) = zambogo.engine.goutil.coords_from_vertex(vertex)
             (x,y) = (x-1,y-1)
             self.stones[x][y]=mark
 
@@ -75,7 +75,7 @@ class Board:
         return timelft
      
     def make_move(self, color, x, y):
-        vertex = goutil.coords_to_vertex(x,y)
+        vertex = zambogo.engine.goutil.coords_to_vertex(x,y)
         try: 
             self.gtp.move(color, vertex)
         except RuntimeError:
