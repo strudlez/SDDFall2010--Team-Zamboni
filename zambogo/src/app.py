@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 import clutter
-import zambogo.actors.gobanactor
-import zambogo.engine.board
 import pygtk
 pygtk.require('2.0')
 import gtk
 import cluttergtk
+
+import zambogo.actors.gobanactor
+import zambogo.engine.board
+import zambogo.library.librarywindow
 
 last_color = "white"
 game_mode = "local"
@@ -121,6 +123,10 @@ class main_window:
         gtk.main_quit()
     def delete_evt(self,widget,event, data=None):
         pass
+    
+    def show_library(self, w, data):
+        self.library.show_all()
+
     def new_game(self,w,data):
         global game_mode
         game_mode = "local"
@@ -228,6 +234,8 @@ class main_window:
         ( "/File/_Open","<control>O", self.load_game, 0, None ),
         ( "/File/_Save","<control>S", self.save_game, 0, None ),
         ( "/File/sep1", None,None, 0, "<Separator>" ),
+        ( "/File/_Library","<control>L", self.show_library, 0, None),
+        ( "/File/sep2", None,None, 0, "<Separator>" ),
         ( "/File/Quit","<control>Q", gtk.main_quit, 0, None ),
         ( "/_Options",None,None, 0, "<Branch>" ),
         ( "/Options/_Settings","<control>R", self.settings_window, 0, None),
@@ -325,6 +333,10 @@ class main_window:
         self.embed.show()
         self.window.show()
         self.mm = self.main_menu(0,None)
+        
+        self.library = zambogo.library.librarywindow.LibraryWindow()
+        self.library.hide()
+
     def main(self):
         gtk.main()
 	

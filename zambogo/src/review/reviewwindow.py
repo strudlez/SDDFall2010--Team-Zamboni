@@ -19,7 +19,7 @@ class ReviewWindow(gtk.Window):
     
     def __make_board(self):
         self.board = zambogo.engine.board.Board()
-        self.goban = zambogo.actors.gobanactor.GobanActor(self.board,self)
+        self.goban = zambogo.actors.gobanactor.GobanActor(self.board)
         self.stage.add(self.goban)
         self.stage.show()
 
