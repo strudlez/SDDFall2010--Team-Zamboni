@@ -1,5 +1,0 @@
-import os
-import gobject
-
-class gtp:
-    def __init__(self, program, cb):
