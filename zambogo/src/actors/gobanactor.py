@@ -1,7 +1,20 @@
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
+
 import clutter
 import zambogo.engine.board
 import zambogo.engine.goutil
-import zambogo.util
 
 class Stone(clutter.Texture):
     def __init__(self,color,x,y):
@@ -9,16 +22,11 @@ class Stone(clutter.Texture):
 
         self.x = x
         self.y = y
-        self.color = color
-		
+
         if color == "black":
-            self.set_from_file(zambogo.util.get_image("black.png"))
-        elif color == "white_c":
-            self.set_from_file(zambogo.util.get_image("white.png"))
-        elif color == "black_c":
-            self.set_from_file(zambogo.util.get_image("black.png"))
+            self.set_from_file("black.png")
         else:
-            self.set_from_file(zambogo.util.get_image("white.png"))
+            self.set_from_file("white.png")
         self.set_size(40,40)
         self.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
 
@@ -27,17 +35,14 @@ class Stone(clutter.Texture):
 class GobanActor(clutter.Group):
     def __place_stone(self, stone):
         (cx, cy) = self.__intersection_to_position(stone.x,stone.y+1)
+        
         self.add(stone)
         stone.set_position(cx,cy)
         stone.show()
 
-    def _update_stones(self, alt_board=None):
-        stones=self.board.stones
-        if(alt_board!=None):
-			stones=alt_board
-        
-        old_stones = self.stone_actors
-        self.stone_actors = {}
+    def __update_stones(self):
+        old_stones = self.stones
+        self.stones = {}
         
         for p in old_stones:
             stone = old_stones[p]
@@ -46,38 +51,18 @@ class GobanActor(clutter.Group):
         for x in range(20):
             for y in range(20):
                 vertex = zambogo.engine.goutil.coords_to_vertex(x,y)
-                vertex2 = zambogo.engine.goutil.coords_to_vertex(x,y+1)
-                if stones[x][y] == 'w':
-					if((self.stone_actors.has_key(vertex))==False):
-						color="white"
-						try:
-							if(self.board.gtp.count_liberties(vertex2)=='1'):
-								color="white_c"
-						except:
-							pass
-						stone = Stone(color,x,y)
-						self.stone_actors[vertex] = stone
-                elif stones[x][y] == 'b':
-					if((self.stone_actors.has_key(vertex))==False):
-						color="black"
-						try:
-							if(self.board.gtp.count_liberties(vertex2)=='1'):
-								color="black"
-						except:
-							pass
-						stone = Stone(color,x,y)
-						self.stone_actors[vertex] = stone
-						
-        for stone in self.stone_actors:
-            self.__place_stone(self.stone_actors[stone])
-        if(alt_board==None):
-			self.history.append(self.board.stones)#keep track of the history for review
-#			self.window.add_hist_button(len(self.history), 1, self.current_color)
-        
-        if(self.current_color=="black"):
-			self.current_color="white"
-        else:
-			self.current_color="black"
+                if self.board.stones[x][y] == 'w':
+                    stone = Stone("white",x,y)
+                    self.stones[vertex] = stone
+                elif self.board.stones[x][y] == 'b':
+                    stone = Stone("black",x,y)
+                    self.stones[vertex] = stone
+
+        for stone in self.stones:
+            self.__place_stone(self.stones[stone])
+                    
+ 
+
             
     def __intersection_from_position(self,cx,cy):
 
@@ -101,39 +86,50 @@ class GobanActor(clutter.Group):
 
         cx = border_width+(line_width+space_width)*(x-1)
         cy = border_width+(line_width+space_height)*(y-1)
+        
         return (cx,cy)
-    
-    def undo(self):
-        self.board.undo()
-        self._update_stones()
-
+        
     def place_stone(self, color, x, y):
         
         if self.board.make_move(color, x, y):
-            self._update_stones()
+            self.__update_stones()
             return True
         
         return False
+        
+    def place_stone_gnugo(self, color, callback):
+        def stone_placed(vertex):
+            self.__update_stones()
+            callback(vertex)
+        self.board.make_gnugo_move(color, stone_placed)
+        return True
         
     def place_stone_at_position(self, Color, cx, cy):
         (x,y) = self.__intersection_from_position(cx,cy)
         return self.place_stone(Color,x,y)
 
-    def __init__(self, board, window):
+    def estimate_score(self):
+        return self.board.estimate_score()
+
+    def final_score(self):
+        return self.board.final_score()
+
+    def get_time(self, color):
+        return self.board.get_time(color)
+
+    def set_time(self, time, bytime):
+        return self.board.set_time(time, bytime)
+
+    def __init__(self, board):
         clutter.Group.__init__(self)#,*args)
         
-        self.current_color="black"
-        
-        self.stone_actors = {}
+        self.stones = {}
         
         self.board = board
-        
-        self.window=window
-		
-        self.history = []
+
         
         self.set_size(700,700)
-        self.background = clutter.Texture(zambogo.util.get_image("goban.png"))
+        self.background = clutter.Texture("goban.png")
         self.background.set_size(700,700)
         self.background.set_position(0,0)
         self.add(self.background)
