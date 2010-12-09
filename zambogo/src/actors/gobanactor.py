@@ -27,7 +27,7 @@ class Stone(clutter.Texture):
         if color == "black":
             self.set_from_file(zambogo.util.get_image("black.png"))
         else:
-            self.set_from_filezambogo.util.get(_image("white.png"))
+            self.set_from_file(zambogo.util.get_image("white.png"))
         self.set_size(40,40)
         self.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
 
