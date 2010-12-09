@@ -15,6 +15,7 @@
 import clutter
 import zambogo.engine.board
 import zambogo.engine.goutil
+import zambogo.util
 
 class Stone(clutter.Texture):
     def __init__(self,color,x,y):
@@ -24,9 +25,9 @@ class Stone(clutter.Texture):
         self.y = y
 
         if color == "black":
-            self.set_from_file("black.png")
+            self.set_from_file(zambogo.util.get_image("black.png"))
         else:
-            self.set_from_file("white.png")
+            self.set_from_filezambogo.util.get(_image("white.png"))
         self.set_size(40,40)
         self.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
 
@@ -129,7 +130,7 @@ class GobanActor(clutter.Group):
 
         
         self.set_size(700,700)
-        self.background = clutter.Texture("goban.png")
+        self.background = clutter.Texture(zambogo.util.get_image("goban.png"))
         self.background.set_size(700,700)
         self.background.set_position(0,0)
         self.add(self.background)
