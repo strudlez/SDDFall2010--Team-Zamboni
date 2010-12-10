@@ -138,6 +138,10 @@ class gtp:
         self.callback = callback
         self.tx('genmove ' + color)
         return True
+    
+    def count_liberties(self, vertex):
+        self.tx('countlib ' + vertex)
+        return self.rx()
               
           
         

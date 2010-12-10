@@ -103,6 +103,9 @@ class Board:
         self.set_move(self.get_move_num()-1)
     def redo(self):
         self.set_move(self.get_move_num()+1)
+        
+    def count_liberties(self, vertex):
+        return int(self.gtp.count_liberties(vertex))
                        
                        
         
