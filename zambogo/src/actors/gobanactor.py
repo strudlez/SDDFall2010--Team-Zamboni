@@ -59,10 +59,12 @@ class GobanActor(clutter.Group):
                     stone = Stone("black",x,y)
                     self.stones[vertex] = stone
                     
-        self.queue_redraw()
-
         for stone in self.stones:
             self.__place_stone(self.stones[stone])
+
+        self.queue_redraw()
+
+
                     
  
 

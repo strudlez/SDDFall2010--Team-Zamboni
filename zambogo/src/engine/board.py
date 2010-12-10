@@ -96,6 +96,7 @@ class Board:
     
     def set_move(self, move):
         self.gtp.undo(self.get_move_num()-move)
+        self.__update_stones()
         return move
     
     def undo(self):
