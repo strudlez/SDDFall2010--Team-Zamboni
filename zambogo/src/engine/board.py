@@ -89,4 +89,14 @@ class Board:
             callback(response)
         self.gtp.genmove(color, gnugo_done)
         return True
+    
+    def get_move_num(self):
+        return len(self.gtp.move_history().split(" "))/2
+
+    
+    def set_move(self, move):
+        self.board.gtp.undo(self.get_move_num()-move)
+        return move
+                       
+                       
         

@@ -107,6 +107,15 @@ class gtp:
     def undo(self):
         self.tx('undo')
         return self.rx()
+    
+    def undo(self, num_moves):
+        self.tx('gg-undo %d' % num_moves)
+        return self.rx()
+    
+    def move_history(self):
+        self.tx("move_history")
+        return self.rx()
+    
 
     def countlib(self, vertex):
         self.tx('countlib ' + vertex)
