@@ -95,8 +95,13 @@ class Board:
 
     
     def set_move(self, move):
-        self.board.gtp.undo(self.get_move_num()-move)
+        self.gtp.undo(self.get_move_num()-move)
         return move
+    
+    def undo(self):
+        self.set_move(self.get_move_num()-1)
+    def redo(self):
+        self.set_move(self.get_move_num()+1)
                        
                        
         

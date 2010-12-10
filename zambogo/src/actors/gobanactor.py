@@ -41,7 +41,7 @@ class GobanActor(clutter.Group):
         stone.set_position(cx,cy)
         stone.show()
 
-    def __update_stones(self):
+    def update_stones(self):
         old_stones = self.stones
         self.stones = {}
         
@@ -58,6 +58,8 @@ class GobanActor(clutter.Group):
                 elif self.board.stones[x][y] == 'b':
                     stone = Stone("black",x,y)
                     self.stones[vertex] = stone
+                    
+        self.queue_redraw()
 
         for stone in self.stones:
             self.__place_stone(self.stones[stone])
@@ -93,14 +95,14 @@ class GobanActor(clutter.Group):
     def place_stone(self, color, x, y):
         
         if self.board.make_move(color, x, y):
-            self.__update_stones()
+            self.update_stones()
             return True
         
         return False
         
     def place_stone_gnugo(self, color, callback):
         def stone_placed(vertex):
-            self.__update_stones()
+            self.update_stones()
             callback(vertex)
         self.board.make_gnugo_move(color, stone_placed)
         return True

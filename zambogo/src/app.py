@@ -119,6 +119,29 @@ def initialize_time(stage, goban): #Initializes the game clock with the desired 
     goban.set_time(time, bytime)
         
 class main_window:
+    
+    def __undo_clicked(self, b):
+        global last_color
+
+        self.goban.board.undo()
+        self.goban.update_stones()
+
+        if last_color == "white":
+           last_color = "black"
+        else:
+           last_color = "white"
+        
+    
+    def __redo_clicked(self, b):
+        global last_color
+        self.goban.board.redo()
+        self.goban.update_stones()
+
+        if last_color == "white":
+            last_color = "black"
+        else:
+            last_color = "white"
+    
     def destroy(self,evt): 
         gtk.main_quit()
     def delete_evt(self,widget,event, data=None):
@@ -309,13 +332,30 @@ class main_window:
         self.time_window.set_text("Time Placeholder")
         self.time_window.set_editable(False)
         self.time_window.show()
-
+        
+        self.undo_b = gtk.Button("Undo")
+        self.undo_b.set_size_request(60,40)
+        self.undo_b.connect("clicked", self.__undo_clicked)
+        
+        self.redo_b = gtk.Button("Redo")
+        self.redo_b.set_size_request(60, 40)
+        self.redo_b.connect("clicked", self.__redo_clicked)
+        
+        self.undo_b.show()
+        self.redo_b.show()
 
         self.toolbar.append_widget(self.forfeit_b,"End Game","Private") #Appens all the widgets to the toolbar and packs the toolbar into a Vbox
         self.toolbar.append_widget(self.pass_b,"Pass Turn","Private")
         self.toolbar.append_widget(self.estimate_b,"Show estimate of current score","Private")
         self.toolbar.append_widget(self.time_window, "Show time remaining","Private")
+        
+        self.undoredobox = gtk.HBox()
+        self.undoredobox.pack_start(self.undo_b)
+        self.undoredobox.pack_start(self.redo_b)
+        
+        self.undoredobox.show()
         self.top_box.pack_start(self.toolbar,True,True,0)
+        self.top_box.pack_start(self.undoredobox, True, True, 0)
 
         self.top_box.show()  #Displays the sidepane
         hpane.pack2(horiz_align,resize=True)
@@ -336,6 +376,7 @@ class main_window:
         
         self.library = zambogo.library.librarywindow.LibraryWindow()
         self.library.hide()
+        self.window.show_all()
 
     def main(self):
         gtk.main()
