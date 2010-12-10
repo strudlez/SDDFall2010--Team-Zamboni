@@ -94,3 +94,13 @@ class Board:
 
     def count_liberties(self, vertex): #Returns the number of liberties at the given vertex
         return self.gtp.count_liberties(vertex)
+    
+    def set_move(self, move):
+        self.gtp.undo(self.get_move_num()-move)
+        self.__update_stones()
+        return move
+    
+    def undo(self):
+        self.set_move(self.get_move_num()-1)
+    def redo(self):
+        self.set_move(self.get_move_num()+1)
