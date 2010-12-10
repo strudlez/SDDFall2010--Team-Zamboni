@@ -352,7 +352,7 @@ class main_window:
         
         self.undoredobox = gtk.HBox()
         self.undoredobox.pack_start(self.undo_b)
-        self.undoredobox.pack_start(self.redo_b)
+#        self.undoredobox.pack_start(self.redo_b)
         
         self.undoredobox.show()
         self.top_box.pack_start(self.toolbar,True,True,0)
