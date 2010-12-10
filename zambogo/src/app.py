@@ -107,7 +107,7 @@ def initialize_handicap(stage, goban): #Place stones at the typical positions in
         goban.place_stone_at_position("black", x_pos[0], y_pos[1])
         goban.place_stone_at_position("black", x_pos[2], y_pos[2])
         goban.place_stone_at_position("black", x_pos[0], y_pos[2])
-    if handicap >= 0:
+    if handicap > 0:
         if game_mode == "ai": #If game mode is AI, the AI, being white, immediately plays
             goban.place_stone_gnugo("white", gnugo_played)
         if game_mode == "local": #If game mode is local, switch the next piece placed to white
