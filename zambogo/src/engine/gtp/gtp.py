@@ -142,6 +142,10 @@ class gtp:
     def count_liberties(self, vertex):
         self.tx('countlib ' + vertex)
         return self.rx()
+        
+    def level(self, lvl): #Sets the Ai level
+        self.tx('level %d' % lvl)
+        return self.rx()
               
           
         

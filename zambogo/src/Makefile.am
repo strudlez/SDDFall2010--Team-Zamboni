@@ -13,7 +13,8 @@ zambogo_PYTHON = \
 	__init__.py  \
 	util.py \
 	dirs.py \
-	app.py
+	app.py \
+	timer.py
 
 dirs.py: dirs.py.in
 	sed -e "s|%pkgdatadir%|$(pkgdatadir)|" $< > $@
