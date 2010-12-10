@@ -167,6 +167,7 @@ class main_window:
     def main_menu(self, w, data): #Initializes the main menu of game modes
         dialog = gtk.Dialog(None, None, gtk.DIALOG_MODAL)
         dialog.set_title("Main Menu")
+        dialog.set_geometry_hints(min_width=150,base_width=150)
         local_b=gtk.Button("Local Play") #Button for local play
         local_b.connect("clicked", self.start_local, self.goban, dialog)
         local_b.set_size_request(60,40)
