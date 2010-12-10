@@ -140,13 +140,13 @@ class gtp:
         self.tx('genmove ' + color)
         return True
     
-def count_liberties(self, vertex): #Returns the number of liberties for the stone at the given vertex
-        self.tx('countlib ' + vertex)
-        return self.rx()
-        
+    def count_liberties(self, vertex): #Returns the number of liberties for the stone at the given vertex
+            self.tx('countlib ' + vertex)
+            return self.rx()
+            
     def level(self, lvl): #Sets the Ai level
-        self.tx('level %d' % lvl)
-        return self.rx()
+            self.tx('level %d' % lvl)
+            return self.rx()
               
           
         
